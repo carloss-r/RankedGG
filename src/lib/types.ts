@@ -1,6 +1,6 @@
 export type Sex = "male" | "female";
 
-export type LiftId = "squat" | "bench" | "deadlift" | "ohp";
+export type LiftId = "squat" | "bench" | "deadlift" | "ohp" | "row" | "pullup" | "curl" | "tricep";
 
 export type RankId =
   | "wood"

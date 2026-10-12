@@ -48,6 +48,50 @@ const MALE: Record<LiftId, BwRow[]> = {
     { bw: 110, levels: [24, 46, 70, 96, 126, 156, 182] },
     { bw: 125, levels: [26, 50, 76, 104, 136, 168, 196] },
   ],
+  row: [
+    { bw: 52, levels: [18, 32, 48, 68, 92, 118, 142] },
+    { bw: 60, levels: [22, 40, 60, 84, 112, 142, 170] },
+    { bw: 67, levels: [26, 46, 70, 98, 130, 164, 194] },
+    { bw: 75, levels: [30, 52, 80, 112, 148, 186, 220] },
+    { bw: 82, levels: [34, 58, 88, 124, 162, 204, 240] },
+    { bw: 90, levels: [38, 64, 96, 136, 178, 222, 260] },
+    { bw: 100, levels: [42, 72, 108, 152, 198, 246, 288] },
+    { bw: 110, levels: [46, 78, 116, 164, 212, 264, 308] },
+    { bw: 125, levels: [50, 86, 126, 178, 230, 286, 332] },
+  ],
+  pullup: [
+    { bw: 52, levels: [0, 0, 10, 20, 35, 50, 65] },
+    { bw: 60, levels: [0, 0, 12, 24, 40, 58, 75] },
+    { bw: 67, levels: [0, 0, 14, 28, 46, 66, 85] },
+    { bw: 75, levels: [0, 0, 16, 32, 52, 74, 95] },
+    { bw: 82, levels: [0, 0, 18, 36, 58, 82, 105] },
+    { bw: 90, levels: [0, 0, 20, 40, 64, 90, 115] },
+    { bw: 100, levels: [0, 0, 22, 44, 70, 98, 125] },
+    { bw: 110, levels: [0, 0, 24, 48, 76, 106, 135] },
+    { bw: 125, levels: [0, 0, 26, 52, 82, 114, 145] },
+  ],
+  curl: [
+    { bw: 52, levels: [8, 14, 20, 28, 38, 48, 58] },
+    { bw: 60, levels: [10, 18, 26, 36, 48, 60, 72] },
+    { bw: 67, levels: [12, 20, 30, 42, 56, 70, 84] },
+    { bw: 75, levels: [14, 24, 34, 48, 64, 80, 96] },
+    { bw: 82, levels: [16, 26, 38, 54, 70, 88, 106] },
+    { bw: 90, levels: [18, 30, 42, 60, 78, 98, 116] },
+    { bw: 100, levels: [20, 34, 48, 68, 88, 110, 130] },
+    { bw: 110, levels: [22, 38, 54, 76, 98, 122, 144] },
+    { bw: 125, levels: [24, 42, 60, 84, 108, 134, 158] },
+  ],
+  tricep: [
+    { bw: 52, levels: [8, 14, 20, 30, 40, 52, 62] },
+    { bw: 60, levels: [10, 18, 26, 38, 50, 64, 76] },
+    { bw: 67, levels: [12, 20, 30, 44, 58, 74, 88] },
+    { bw: 75, levels: [14, 24, 36, 50, 66, 84, 100] },
+    { bw: 82, levels: [16, 28, 40, 56, 74, 94, 112] },
+    { bw: 90, levels: [18, 30, 44, 62, 82, 104, 124] },
+    { bw: 100, levels: [20, 34, 50, 70, 92, 116, 138] },
+    { bw: 110, levels: [22, 38, 56, 78, 102, 128, 152] },
+    { bw: 125, levels: [24, 42, 62, 86, 112, 140, 166] },
+  ],
 };
 
 const FEMALE: Record<LiftId, BwRow[]> = {
@@ -91,6 +135,46 @@ const FEMALE: Record<LiftId, BwRow[]> = {
     { bw: 82, levels: [14, 24, 38, 54, 70, 88, 104] },
     { bw: 90, levels: [15, 26, 42, 58, 76, 96, 114] },
   ],
+  row: [
+    { bw: 44, levels: [10, 18, 28, 42, 58, 76, 92] },
+    { bw: 52, levels: [12, 22, 34, 50, 68, 88, 106] },
+    { bw: 56, levels: [14, 24, 38, 56, 76, 98, 118] },
+    { bw: 60, levels: [16, 28, 44, 64, 86, 110, 132] },
+    { bw: 67, levels: [18, 32, 50, 72, 96, 122, 146] },
+    { bw: 75, levels: [20, 36, 56, 80, 106, 134, 160] },
+    { bw: 82, levels: [22, 40, 62, 88, 116, 146, 174] },
+    { bw: 90, levels: [24, 44, 68, 96, 126, 158, 188] },
+  ],
+  pullup: [
+    { bw: 44, levels: [0, 0, 6, 14, 24, 36, 48] },
+    { bw: 52, levels: [0, 0, 8, 18, 30, 44, 58] },
+    { bw: 56, levels: [0, 0, 10, 20, 34, 50, 66] },
+    { bw: 60, levels: [0, 0, 12, 24, 40, 58, 76] },
+    { bw: 67, levels: [0, 0, 14, 28, 46, 66, 86] },
+    { bw: 75, levels: [0, 0, 16, 32, 52, 74, 96] },
+    { bw: 82, levels: [0, 0, 18, 36, 58, 82, 106] },
+    { bw: 90, levels: [0, 0, 20, 40, 64, 90, 116] },
+  ],
+  curl: [
+    { bw: 44, levels: [5, 10, 14, 20, 28, 36, 44] },
+    { bw: 52, levels: [6, 12, 18, 26, 36, 46, 56] },
+    { bw: 56, levels: [7, 14, 20, 30, 40, 52, 62] },
+    { bw: 60, levels: [8, 16, 24, 34, 46, 58, 70] },
+    { bw: 67, levels: [10, 18, 28, 40, 54, 68, 82] },
+    { bw: 75, levels: [12, 22, 34, 48, 64, 80, 96] },
+    { bw: 82, levels: [14, 26, 40, 56, 74, 92, 110] },
+    { bw: 90, levels: [16, 30, 46, 64, 84, 104, 124] },
+  ],
+  tricep: [
+    { bw: 44, levels: [5, 10, 14, 22, 30, 38, 46] },
+    { bw: 52, levels: [6, 12, 18, 28, 38, 48, 58] },
+    { bw: 56, levels: [7, 14, 22, 32, 44, 56, 68] },
+    { bw: 60, levels: [8, 16, 24, 36, 48, 62, 74] },
+    { bw: 67, levels: [10, 18, 28, 42, 56, 72, 86] },
+    { bw: 75, levels: [12, 22, 34, 50, 66, 84, 100] },
+    { bw: 82, levels: [14, 26, 40, 58, 76, 96, 114] },
+    { bw: 90, levels: [16, 30, 46, 66, 86, 108, 128] },
+  ],
 };
 
 export const LEVEL_LABELS = [
@@ -113,9 +197,13 @@ export const LIFT_META: Record<
   bench: { name: "Press banca", short: "Banca", weight: 0.25 },
   deadlift: { name: "Peso muerto", short: "Muerto", weight: 0.3 },
   ohp: { name: "Press militar", short: "Militar", weight: 0.15 },
+  row: { name: "Remo con barra", short: "Remo", weight: 0.1 },
+  pullup: { name: "Dominadas", short: "Dominadas", weight: 0.08 },
+  curl: { name: "Curl con barra", short: "Curl", weight: 0.06 },
+  tricep: { name: "Extensiones tríceps", short: "Tríceps", weight: 0.06 },
 };
 
-export const LIFTS: LiftId[] = ["squat", "bench", "deadlift", "ohp"];
+export const LIFTS: LiftId[] = ["squat", "bench", "deadlift", "ohp", "row", "pullup", "curl", "tricep"];
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;

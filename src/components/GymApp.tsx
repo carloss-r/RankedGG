@@ -5,6 +5,7 @@ import { useGym } from "../hooks/useGym";
 import { Onboarding } from "./Onboarding";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LogScreen } from "./screens/LogScreen";
+import { ManualScreen } from "./screens/ManualScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
 import { RanksScreen } from "./screens/RanksScreen";
@@ -14,6 +15,7 @@ const TABS = [
   { id: "progress", label: "Progreso" },
   { id: "ranks", label: "Rangos" },
   { id: "log", label: "Marcas" },
+  { id: "manual", label: "Manual" },
   { id: "profile", label: "Yo" },
 ] as const;
 
@@ -56,6 +58,7 @@ export function GymApp() {
         {tab === "log" && (
           <LogScreen entries={gym.entries} onLog={gym.logLift} onDelete={gym.removeLift} />
         )}
+        {tab === "manual" && <ManualScreen />}
         {tab === "profile" && (
           <ProfileScreen
             profile={gym.profile}
@@ -129,6 +132,13 @@ function TabIcon({ id, active }: { id: TabId; active: boolean }) {
     return (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path d="M12 5v14M5 12h14" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (id === "manual") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 6.25V3.5m0 2.75a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-1.5 0V7a.75.75 0 0 1 .75-.75Zm0 9.5V18.5m0-2.75a.75.75 0 0 1 .75-.75v-2.5a.75.75 0 0 1-1.5 0v2.5a.75.75 0 0 1 .75.75ZM6 12a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z" stroke={stroke} strokeWidth="1.7" />
       </svg>
     );
   }

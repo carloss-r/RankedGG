@@ -24,6 +24,10 @@ export function Onboarding({ onComplete }: Props) {
     bench: "",
     deadlift: "",
     ohp: "",
+    row: "",
+    pullup: "",
+    curl: "",
+    tricep: "",
   });
   const [busy, setBusy] = useState(false);
 
