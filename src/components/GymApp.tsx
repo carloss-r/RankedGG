@@ -24,6 +24,7 @@ type TabId = (typeof TABS)[number]["id"];
 export function GymApp() {
   const gym = useGym();
   const [tab, setTab] = useState<TabId>("home");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   if (!gym.ready) {
     return (
@@ -51,7 +52,7 @@ export function GymApp() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
-      <main className="flex-1 px-5 pt-[calc(var(--safe-top)+18px)] pb-[calc(108px+var(--safe-bottom))]">
+      <main className="flex-1 px-5 pt-[calc(var(--safe-top)+18px)] pb-[calc(20px+var(--safe-bottom))]">
         {tab === "home" && <HomeScreen profile={gym.profile} snapshot={gym.snapshot} />}
         {tab === "progress" && <ProgressScreen entries={gym.entries} />}
         {tab === "ranks" && <RanksScreen snapshot={gym.snapshot} />}
@@ -72,26 +73,47 @@ export function GymApp() {
         )}
       </main>
 
-      <nav className="glass-strong fixed right-0 bottom-0 left-0 z-20 mx-auto max-w-md rounded-t-[28px] border-t border-white/10 px-3 pt-2 pb-[calc(10px+var(--safe-bottom))]">
-        <div className="grid grid-cols-5">
-          {TABS.map((item) => {
-            const active = tab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setTab(item.id)}
-                className={`flex flex-col items-center gap-1 py-2 text-[11px] ${
-                  active ? "text-white" : "text-white/40"
-                }`}
-              >
-                <TabIcon id={item.id} active={active} />
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
+      {/* Floating menu button */}
+      <button
+        type="button"
+        onClick={() => setMenuOpen(!menuOpen)}
+        className="glass-strong fixed bottom-6 right-6 z-30 flex h-16 w-16 items-center justify-center rounded-full border border-white/20 shadow-2xl"
+      >
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="white" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      </button>
+
+      {/* Menu overlay */}
+      {menuOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div className="glass-strong fixed bottom-24 right-6 z-30 w-56 rounded-2xl border border-white/10 p-2 shadow-2xl">
+            {TABS.map((item) => {
+              const active = tab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    setTab(item.id);
+                    setMenuOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[15px] ${
+                    active ? "bg-white/10 text-white" : "text-white/70"
+                  }`}
+                >
+                  <TabIcon id={item.id} active={active} />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

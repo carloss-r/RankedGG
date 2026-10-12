@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { formatKg, formatPercent } from "../../lib/engine";
+import { getRandomQuote } from "../../lib/quotes";
 import { LIFT_META } from "../../lib/standards";
 import type { Profile, RankSnapshot } from "../../lib/types";
 import { Glass } from "../ui";
@@ -12,6 +14,15 @@ export function HomeScreen({
   profile: Profile;
   snapshot: RankSnapshot;
 }) {
+  const [quote, setQuote] = useState(getRandomQuote());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setQuote(getRandomQuote());
+    }, 30000); // Cambiar cada 30 segundos
+    return () => clearInterval(interval);
+  }, []);
+
   const hour = new Date().getHours();
   const hello = hour < 12 ? "Buenos días" : hour < 19 ? "Buenas tardes" : "Buenas noches";
   const logged = snapshot.lifts.filter((lift) => lift.oneRm > 0);
@@ -37,6 +48,10 @@ export function HomeScreen({
           {profile.name}
         </h1>
       </header>
+
+      <Glass className="px-4 py-3">
+        <p className="text-[14px] leading-5 text-center text-white/80 italic">"{quote}"</p>
+      </Glass>
 
       <Glass className="relative overflow-hidden px-5 pt-6 pb-5">
         <div
