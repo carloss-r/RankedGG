@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useGym } from "../hooks/useGym";
 import { Onboarding } from "./Onboarding";
 import { HomeScreen } from "./screens/HomeScreen";
+import { LeaderboardScreen } from "./screens/LeaderboardScreen";
 import { LogScreen } from "./screens/LogScreen";
 import { ManualScreen } from "./screens/ManualScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
@@ -14,6 +15,7 @@ const TABS = [
   { id: "home", label: "Inicio" },
   { id: "progress", label: "Progreso" },
   { id: "ranks", label: "Rangos" },
+  { id: "leaderboard", label: "Ranking" },
   { id: "log", label: "Marcas" },
   { id: "manual", label: "Manual" },
   { id: "profile", label: "Yo" },
@@ -53,9 +55,20 @@ export function GymApp() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
       <main className="flex-1 px-5 pt-[calc(var(--safe-top)+18px)] pb-[calc(20px+var(--safe-bottom))]">
-        {tab === "home" && <HomeScreen profile={gym.profile} snapshot={gym.snapshot} />}
+        {tab === "home" && (
+          <HomeScreen profile={gym.profile} snapshot={gym.snapshot} rpg={gym.rpg} />
+        )}
         {tab === "progress" && <ProgressScreen entries={gym.entries} />}
         {tab === "ranks" && <RanksScreen snapshot={gym.snapshot} />}
+        {tab === "leaderboard" && (
+          <LeaderboardScreen
+            identity={gym.identity}
+            shareGlobally={gym.shareGlobally}
+            sync={gym.sync}
+            hasMarks={gym.entries.length > 0}
+            onEnable={gym.enableGlobal}
+          />
+        )}
         {tab === "log" && (
           <LogScreen entries={gym.entries} onLog={gym.logLift} onDelete={gym.removeLift} />
         )}
@@ -64,6 +77,12 @@ export function GymApp() {
           <ProfileScreen
             profile={gym.profile}
             entriesCount={gym.entries.length}
+            shareGlobally={gym.shareGlobally}
+            sync={gym.sync}
+            onToggleGlobal={async (on) => {
+              if (on) await gym.enableGlobal();
+              else await gym.disableGlobal();
+            }}
             onSave={gym.upsertProfile}
             onReset={async () => {
               await gym.reset();
@@ -147,6 +166,18 @@ function TabIcon({ id, active }: { id: TabId; active: boolean }) {
     return (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path d="M7 20V10h3v10H7Zm7 0V6h3v14h-3ZM4 20h16" stroke={stroke} strokeWidth="1.7" />
+      </svg>
+    );
+  }
+  if (id === "leaderboard") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M8 4h8v5a4 4 0 0 1-8 0V4Zm0 2H4v1a3 3 0 0 0 3 3M16 6h4v1a3 3 0 0 1-3 3M12 13v4m-3 3h6"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }

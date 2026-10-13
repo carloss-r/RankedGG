@@ -1,6 +1,32 @@
 export type Sex = "male" | "female";
 
-export type LiftId = "squat" | "bench" | "deadlift" | "ohp" | "row" | "pullup" | "curl" | "tricep";
+/** Id de ejercicio. Los ids válidos salen de src/data/exercises.json. */
+export type LiftId = string;
+
+export type RpgStatId = string;
+
+export type BwRow = { bw: number; levels: number[] };
+
+export type ExerciseDef = {
+  id: LiftId;
+  name: string;
+  short: string;
+  category: "compound" | "isolation" | "bodyweight";
+  pattern: string;
+  /** Atributo RPG al que aporta (STR, VIT, AGI...). */
+  stat: RpgStatId;
+  /** Peso del ejercicio dentro del score global (0-1). */
+  scoreWeight: number;
+  /** Multiplicador de experiencia (XP) por punto de score. */
+  xpMultiplier: number;
+  unit: "kg";
+  standards: Record<Sex, BwRow[]>;
+};
+
+export type RpgConfig = {
+  stats: Record<RpgStatId, { name: string; description: string }>;
+  xp: { perScorePoint: number; levelDivisor: number };
+};
 
 export type RankId =
   | "wood"

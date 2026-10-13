@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { formatKg, formatPercent } from "../../lib/engine";
+import { RPG } from "../../lib/catalog";
 import { getRandomQuote } from "../../lib/quotes";
+import type { RpgSheet } from "../../lib/rpg";
 import { LIFT_META } from "../../lib/standards";
 import type { Profile, RankSnapshot } from "../../lib/types";
 import { Glass } from "../ui";
@@ -10,9 +12,11 @@ import { Glass } from "../ui";
 export function HomeScreen({
   profile,
   snapshot,
+  rpg,
 }: {
   profile: Profile;
   snapshot: RankSnapshot;
+  rpg: RpgSheet | null;
 }) {
   const [quote, setQuote] = useState(getRandomQuote());
 
@@ -102,6 +106,36 @@ export function HomeScreen({
           </p>
         </div>
       </Glass>
+
+      {rpg && (
+        <Glass className="px-5 py-5">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-[12px] tracking-[0.16em] text-white/45 uppercase">Nivel</p>
+              <p className="text-[34px] leading-none font-semibold">{rpg.level}</p>
+            </div>
+            <p className="text-[13px] text-white/50">{rpg.xp} XP</p>
+          </div>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${Math.round(rpg.levelProgress * 100)}%`,
+                background: snapshot.rank.color,
+              }}
+            />
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            {Object.entries(RPG.stats).map(([id, stat]) => (
+              <div key={id}>
+                <p className="text-[11px] tracking-[0.14em] text-white/45 uppercase">{id}</p>
+                <p className="text-[20px] font-semibold">{rpg.stats[id] ?? 0}</p>
+                <p className="text-[11px] text-white/45">{stat.name}</p>
+              </div>
+            ))}
+          </div>
+        </Glass>
+      )}
 
       <Glass className="px-5 py-5">
         <p className="text-[12px] tracking-[0.16em] text-white/45 uppercase">

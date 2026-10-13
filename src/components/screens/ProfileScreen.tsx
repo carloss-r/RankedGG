@@ -1,17 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import type { GlobalSync } from "../../hooks/useGym";
 import type { Profile, Sex } from "../../lib/types";
 import { Field, Glass, PrimaryButton, TextInput } from "../ui";
+import { errorMessage } from "./LeaderboardScreen";
 
 export function ProfileScreen({
   profile,
   entriesCount,
+  shareGlobally,
+  sync,
+  onToggleGlobal,
   onSave,
   onReset,
 }: {
   profile: Profile;
   entriesCount: number;
+  shareGlobally: boolean;
+  sync: GlobalSync;
+  onToggleGlobal: (on: boolean) => Promise<void>;
   onSave: (input: { name: string; sex: Sex; bodyweightKg: number }) => Promise<void>;
   onReset: () => Promise<void>;
 }) {
@@ -64,10 +72,44 @@ export function ProfileScreen({
         <PrimaryButton onClick={save}>{saved ? "Guardado" : "Guardar cambios"}</PrimaryButton>
       </Glass>
 
+      <Glass className="flex flex-col gap-3 px-5 py-5">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-[16px] font-semibold">Ranking global</p>
+            <p className="mt-1 text-[13px] leading-5 text-white/60">
+              Comparte nombre, rango y mejores marcas. Tu peso corporal no se muestra.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={shareGlobally}
+            onClick={() => onToggleGlobal(!shareGlobally)}
+            className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${
+              shareGlobally ? "bg-emerald-400" : "bg-white/15"
+            }`}
+          >
+            <span
+              className={`absolute top-1 h-6 w-6 rounded-full bg-white transition-all ${
+                shareGlobally ? "left-7" : "left-1"
+              }`}
+            />
+          </button>
+        </div>
+        {shareGlobally && (
+          <p className="text-[13px] text-white/55">
+            {sync.status === "syncing" && "Sincronizando…"}
+            {sync.status === "ok" && sync.me && `Posición global #${sync.me.position}`}
+            {sync.status === "error" && errorMessage(sync.error)}
+            {sync.status === "idle" && "Se sincroniza al guardar una marca."}
+          </p>
+        )}
+      </Glass>
+
       <Glass className="px-5 py-5">
         <p className="text-[15px] leading-6 text-white/70">
-          {entriesCount} marcas guardadas en este teléfono. RankedGG usa IndexedDB local:
-          los datos no salen del dispositivo.
+          {entriesCount} marcas guardadas en este teléfono. Tu historial vive en IndexedDB;
+          al unirte al ranking solo se envían tu perfil y tus mejores marcas.
         </p>
       </Glass>
 

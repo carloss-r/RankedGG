@@ -19,16 +19,9 @@ export function Onboarding({ onComplete }: Props) {
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("male");
   const [bw, setBw] = useState("75");
-  const [marks, setMarks] = useState<Record<LiftId, string>>({
-    squat: "",
-    bench: "",
-    deadlift: "",
-    ohp: "",
-    row: "",
-    pullup: "",
-    curl: "",
-    tricep: "",
-  });
+  const [marks, setMarks] = useState<Record<LiftId, string>>(() =>
+    Object.fromEntries(LIFTS.map((lift) => [lift, ""])),
+  );
   const [busy, setBusy] = useState(false);
 
   async function finish() {

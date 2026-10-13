@@ -48,6 +48,22 @@ export async function saveProfile(profile: Profile) {
   await txDone(tx);
 }
 
+export async function loadMeta<T>(key: string): Promise<T | null> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const request = db.transaction("meta").objectStore("meta").get(key);
+    request.onsuccess = () => resolve((request.result as T | undefined) ?? null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function saveMeta<T>(key: string, value: T) {
+  const db = await openDb();
+  const tx = db.transaction("meta", "readwrite");
+  tx.objectStore("meta").put(value, key);
+  await txDone(tx);
+}
+
 export async function loadLifts(): Promise<LiftEntry[]> {
   const db = await openDb();
   return new Promise((resolve, reject) => {

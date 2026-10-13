@@ -1,3 +1,4 @@
+import { LEVELS } from "./catalog";
 import { nextRankFromScore, rankFromScore } from "./ranks";
 import {
   expectedLevels,
@@ -36,8 +37,8 @@ function scoreFromOneRm(oneRm: number, levels: number[]) {
     const high = levels[i + 1];
     if (oneRm <= high) {
       const t = (oneRm - low) / (high - low || 1);
-      const scoreLow = [6, 18, 32, 50, 68, 86, 98][i];
-      const scoreHigh = [18, 32, 50, 68, 86, 98, 100][i];
+      const scoreLow = LEVELS.scoreLow[i];
+      const scoreHigh = LEVELS.scoreHigh[i];
       const pctLow = LEVEL_PERCENTILES[i];
       const pctHigh = LEVEL_PERCENTILES[i + 1];
       return {
