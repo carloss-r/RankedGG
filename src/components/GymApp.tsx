@@ -62,7 +62,7 @@ export function GymApp() {
         {tab === "ranks" && <RanksScreen snapshot={gym.snapshot} />}
         {tab === "leaderboard" && (
           <LeaderboardScreen
-            identity={gym.identity}
+            playerId={gym.playerId}
             shareGlobally={gym.shareGlobally}
             sync={gym.sync}
             hasMarks={gym.entries.length > 0}

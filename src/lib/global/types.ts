@@ -1,36 +1,6 @@
-import type { LiftId, RankId, Sex } from "../types";
+import type { RankId } from "../types";
 
-/** Lo que el cliente envía al servidor. El servidor recalcula todo a partir de esto. */
-export type SubmitPayload = {
-  playerId: string;
-  secret: string;
-  name: string;
-  sex: Sex;
-  bodyweightKg: number;
-  /** Mejor 1RM estimado (kg) por ejercicio. Solo los ejercicios registrados. */
-  bests: Record<LiftId, number>;
-  catalogVersion: number;
-};
-
-/** Registro completo en el servidor (nunca se expone tal cual). */
-export type PlayerRecord = {
-  id: string;
-  secretHash: string;
-  name: string;
-  sex: Sex;
-  bodyweightKg: number;
-  bests: Record<LiftId, number>;
-  liftScores: Record<LiftId, number>;
-  score: number;
-  percentile: number;
-  rankId: RankId;
-  xp: number;
-  level: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-/** Fila pública del ranking (sin peso corporal ni secretos). */
+/** Fila pública del ranking. `score` es el valor por el que se ordena (global o del ejercicio). */
 export type LeaderboardEntry = {
   position: number;
   id: string;
@@ -44,14 +14,28 @@ export type LeaderboardEntry = {
 
 export type LeaderboardResponse = {
   /** undefined = ranking general. */
-  lift?: LiftId;
+  lift?: string;
   entries: LeaderboardEntry[];
   me: LeaderboardEntry | null;
 };
 
-export type SubmitResponse = {
-  ok: true;
-  me: LeaderboardEntry;
+/** Forma exacta de lo que se guarda en players/{uid}. No incluye peso corporal ni sexo. */
+export type PublishedPlayer = {
+  name: string;
+  rankId: RankId;
+  level: number;
+  xp: number;
+  score: number;
+  percentile: number;
+  updatedAt: number;
+  bests: Record<string, number>;
 };
 
-export type ApiError = { ok?: false; error: string; detail?: string };
+/** Forma exacta de lo que se guarda en lifts/{lift}/{uid}. */
+export type PublishedLift = {
+  name: string;
+  rankId: RankId;
+  level: number;
+  score: number;
+  oneRm: number;
+};

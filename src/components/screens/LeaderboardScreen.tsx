@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { formatKg } from "../../lib/engine";
-import { fetchLeaderboard, GlobalError, type GlobalIdentity } from "../../lib/global/client";
+import { fetchLeaderboard } from "../../lib/firebase/leaderboard";
+import { toGlobalError } from "../../lib/global/errors";
 import type { LeaderboardEntry, LeaderboardResponse } from "../../lib/global/types";
 import { rankById } from "../../lib/ranks";
 import { LIFT_META, LIFTS } from "../../lib/standards";
@@ -16,14 +17,14 @@ type Result = { key: string; data?: LeaderboardResponse; error?: string };
 
 export function errorMessage(code?: string) {
   switch (code) {
-    case "backend_not_configured":
-      return "El ranking global aún no está activado en este servidor.";
+    case "auth_disabled":
+      return "Falta activar el acceso anónimo en Firebase Authentication.";
+    case "permission_denied":
+      return "Firebase rechazó la operación. Revisa que las reglas de la base estén publicadas.";
+    case "no_marks":
+      return "Registra al menos una marca para aparecer en el ranking.";
     case "implausible_mark":
       return "Una de tus marcas parece fuera de rango para tu peso. Revísala.";
-    case "catalog_mismatch":
-      return "Actualiza la app para seguir sincronizando.";
-    case "rate_limited":
-      return "Demasiados envíos seguidos. Intenta en un minuto.";
     case "network":
       return "Sin conexión. Se reintentará cuando cambies una marca.";
     default:
@@ -32,13 +33,13 @@ export function errorMessage(code?: string) {
 }
 
 export function LeaderboardScreen({
-  identity,
+  playerId: knownPlayerId,
   shareGlobally,
   sync,
   hasMarks,
   onEnable,
 }: {
-  identity: GlobalIdentity | null;
+  playerId: string | null;
   shareGlobally: boolean;
   sync: GlobalSync;
   hasMarks: boolean;
@@ -48,7 +49,7 @@ export function LeaderboardScreen({
   const [result, setResult] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const playerId = shareGlobally ? identity?.playerId : undefined;
+  const playerId = shareGlobally ? knownPlayerId : null;
   // Se vuelve a pedir cuando cambia el ejercicio o cuando se sincroniza un nuevo score.
   const key = `${scope}|${playerId ?? ""}|${sync.me?.score ?? ""}`;
 
@@ -60,7 +61,7 @@ export function LeaderboardScreen({
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setResult({ key, error: err instanceof GlobalError ? err.code : "network" });
+          setResult({ key, error: toGlobalError(err).code });
         }
       });
     return () => {

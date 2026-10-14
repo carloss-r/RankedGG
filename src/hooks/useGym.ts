@@ -12,25 +12,20 @@ import {
   saveProfile,
 } from "../lib/db";
 import { bestOneRm, computeSnapshot } from "../lib/engine";
-import {
-  createIdentity,
-  GlobalError,
-  leaveGlobal,
-  submitScores,
-  type GlobalIdentity,
-  type GlobalSettings,
-} from "../lib/global/client";
+import { ensureUser, leavePlayer, publishPlayer } from "../lib/firebase/leaderboard";
+import { toGlobalError } from "../lib/global/errors";
 import type { LeaderboardEntry } from "../lib/global/types";
 import { computeRpgSheet } from "../lib/rpg";
 import { epley1rm, LIFTS } from "../lib/standards";
 import type { LiftEntry, LiftId, Profile, Sex } from "../lib/types";
 
-const IDENTITY_KEY = "global-identity";
 const SETTINGS_KEY = "global-settings";
+
+type GlobalSettings = { shareGlobally: boolean };
 
 export type GlobalSync = {
   status: "idle" | "syncing" | "ok" | "error";
-  /** Código de error de la API (p. ej. backend_not_configured, implausible_mark). */
+  /** Código de error (p. ej. auth_disabled, permission_denied, implausible_mark). */
   error?: string;
   detail?: string;
   me?: LeaderboardEntry;
@@ -41,20 +36,19 @@ export function useGym() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [entries, setEntries] = useState<LiftEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [identity, setIdentity] = useState<GlobalIdentity | null>(null);
+  /** uid de Firebase Auth (anónimo). Se conoce tras la primera sincronización. */
+  const [playerId, setPlayerId] = useState<string | null>(null);
   const [shareGlobally, setShareGlobally] = useState(false);
   const [sync, setSync] = useState<GlobalSync>({ status: "idle" });
 
   const refresh = useCallback(async () => {
-    const [nextProfile, nextEntries, nextIdentity, nextSettings] = await Promise.all([
+    const [nextProfile, nextEntries, nextSettings] = await Promise.all([
       loadProfile(),
       loadLifts(),
-      loadMeta<GlobalIdentity>(IDENTITY_KEY),
       loadMeta<GlobalSettings>(SETTINGS_KEY),
     ]);
     setProfile(nextProfile);
     setEntries(nextEntries);
-    setIdentity(nextIdentity);
     setShareGlobally(nextSettings?.shareGlobally ?? false);
   }, []);
 
@@ -87,28 +81,21 @@ export function useGym() {
 
   // Sincroniza con el ranking global (con debounce) cuando el usuario participa.
   useEffect(() => {
-    if (!ready || !shareGlobally || !identity || !profile) return;
+    if (!ready || !shareGlobally || !profile) return;
     if (Object.keys(bests).length === 0) return;
 
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       setSync((prev) => ({ ...prev, status: "syncing" }));
       try {
-        const res = await submitScores({
-          identity,
-          name: profile.name,
-          sex: profile.sex,
-          bodyweightKg: profile.bodyweightKg,
-          bests,
-        });
-        if (!cancelled) setSync({ status: "ok", me: res.me });
+        const me = await publishPlayer({ profile, entries, bests });
+        if (cancelled) return;
+        setPlayerId(me.id);
+        setSync({ status: "ok", me });
       } catch (err) {
         if (cancelled) return;
-        if (err instanceof GlobalError) {
-          setSync({ status: "error", error: err.code, detail: err.detail });
-        } else {
-          setSync({ status: "error", error: "network" });
-        }
+        const failure = toGlobalError(err);
+        setSync({ status: "error", error: failure.code, detail: failure.detail });
       }
     }, 800);
 
@@ -116,30 +103,31 @@ export function useGym() {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [ready, shareGlobally, identity, profile, bests]);
+  }, [ready, shareGlobally, profile, entries, bests]);
 
   const enableGlobal = useCallback(async () => {
-    const next = identity ?? createIdentity();
-    if (!identity) {
-      await saveMeta(IDENTITY_KEY, next);
-      setIdentity(next);
-    }
     await saveMeta<GlobalSettings>(SETTINGS_KEY, { shareGlobally: true });
     setShareGlobally(true);
-  }, [identity]);
+    try {
+      // Crea (o recupera) la sesión anónima para poder ver tu posición de inmediato.
+      const user = await ensureUser();
+      setPlayerId(user.uid);
+    } catch (err) {
+      const failure = toGlobalError(err);
+      setSync({ status: "error", error: failure.code, detail: failure.detail });
+    }
+  }, []);
 
   const disableGlobal = useCallback(async () => {
     await saveMeta<GlobalSettings>(SETTINGS_KEY, { shareGlobally: false });
     setShareGlobally(false);
     setSync({ status: "idle" });
-    if (identity) {
-      try {
-        await leaveGlobal(identity);
-      } catch {
-        // Si falla (sin conexión), el usuario ya no se actualiza; puede reintentar al volver a activar.
-      }
+    try {
+      await leavePlayer();
+    } catch {
+      // Sin conexión: ya no se actualiza; al volver a activar se reescribe tu ficha.
     }
-  }, [identity]);
+  }, []);
 
   const upsertProfile = useCallback(
     async (partial: { name: string; sex: Sex; bodyweightKg: number }) => {
@@ -179,9 +167,9 @@ export function useGym() {
   }, []);
 
   const reset = useCallback(async () => {
-    if (identity && shareGlobally) {
+    if (shareGlobally) {
       try {
-        await leaveGlobal(identity);
+        await leavePlayer();
       } catch {
         // Best effort: igualmente se borran los datos locales.
       }
@@ -189,10 +177,10 @@ export function useGym() {
     await clearAll();
     setProfile(null);
     setEntries([]);
-    setIdentity(null);
+    setPlayerId(null);
     setShareGlobally(false);
     setSync({ status: "idle" });
-  }, [identity, shareGlobally]);
+  }, [shareGlobally]);
 
   return {
     ready,
@@ -201,7 +189,7 @@ export function useGym() {
     entries,
     snapshot,
     rpg,
-    identity,
+    playerId,
     shareGlobally,
     sync,
     enableGlobal,

@@ -54,22 +54,28 @@ Si cambias la estructura o los estándares de forma incompatible, sube `version`
 
 XP y nivel: `xp = Σ score × xpMultiplier × rpg.xp.perScorePoint`, `nivel = 1 + floor(√(xp / rpg.xp.levelDivisor))`.
 
-## Ranking global
+## Ranking global (Firebase)
 
-- El usuario activa **Ranking global** (pestaña Ranking o Perfil). Se crea una identidad anónima en el dispositivo (`playerId` + `secret`); no hay cuentas.
-- El cliente envía a `POST /api/scores` solo nombre, sexo, peso corporal y mejor 1RM por ejercicio. **El servidor recalcula** score, rango, XP y nivel, y rechaza marcas implausibles (> 1.35× clase mundial para ese peso).
-- `GET /api/leaderboard?lift=squat&limit=50&playerId=...` devuelve el ranking general o por ejercicio y tu posición. El peso corporal nunca se expone.
-- `DELETE /api/scores` saca al usuario del ranking.
+Usa **Firebase Authentication (anónimo)** + **Realtime Database** del proyecto `rankedgg-d64be`. No hay servidor propio: el navegador escribe directo en Firebase y la seguridad la dan las reglas de la base.
 
-### Configurar el backend (Supabase)
+- El usuario activa **Ranking global** (pestaña Ranking o Perfil). Firebase le asigna un `uid` anónimo; no hay cuentas ni contraseñas.
+- Se publican nombre, rango, nivel, XP, score y mejor 1RM por ejercicio. **El peso corporal y el sexo no se guardan**: el score se calcula en el dispositivo.
+- Estructura: `players/{uid}` (ranking general) y `lifts/{lift}/{uid}` (por ejercicio), ambos indexados por `score`.
+- Solo el dueño (`auth.uid`) puede escribir su nodo; las reglas validan tipos, rangos (score 0-100) y un tope de 1RM por ejercicio.
 
-1. Crea un proyecto en Supabase y ejecuta [`supabase/schema.sql`](supabase/schema.sql) en el SQL editor.
-2. En Vercel (o en `.env.local`) define, solo del lado servidor:
+### Puesta en marcha (una sola vez)
 
-```bash
-SUPABASE_URL=https://TU-PROYECTO.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=...
-```
+1. **Authentication → Sign-in method → Anónimo → Habilitar.**
+2. **Realtime Database**: debe existir (modo bloqueado está bien) en `https://rankedgg-d64be-default-rtdb.firebaseio.com`.
+3. Publica las reglas, con una de estas dos opciones:
+   - Consola: *Realtime Database → Reglas* → pega el contenido de [`database.rules.json`](database.rules.json) → **Publicar**.
+   - CLI: `npx firebase-tools login` y luego `npx firebase-tools deploy --only database`.
+4. Si cambias `src/data/exercises.json`, regenera las reglas con `npm run rules` y vuelve a publicarlas.
+5. (Recomendado) En Google Cloud → *Credenciales*, restringe la API key a tus dominios (HTTP referrers).
 
-Sin esas variables, en desarrollo se usa un almacén en memoria (se pierde al reiniciar) y en producción la API responde `503 backend_not_configured`.
-Para usar otro proveedor, implementa la interfaz `PlayerStore` en [`src/lib/server/store.ts`](src/lib/server/store.ts).
+La configuración web está en [`src/lib/firebase/app.ts`](src/lib/firebase/app.ts) (no es secreta) y se puede sobrescribir con variables `NEXT_PUBLIC_FIREBASE_*`.
+
+### Límites conocidos
+
+- Sin servidor no se puede recalcular el score del lado seguro: alguien con conocimientos podría escribir un score falso dentro de los topes de las reglas. Para un ranking competitivo serio, el siguiente paso es una Cloud Function que valide y escriba.
+- La posición cuando estás fuera del top 100 descarga a quienes van delante de ti; es válido para miles de usuarios, no para cientos de miles.
