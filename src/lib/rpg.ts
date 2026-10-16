@@ -1,4 +1,4 @@
-import { EXERCISES, RPG } from "./catalog";
+import { EXERCISES, exercisesOfMuscle, MUSCLE_IDS, RPG } from "./catalog";
 import type { LiftScore, RpgStatId } from "./types";
 
 export type RpgSheet = {
@@ -50,4 +50,25 @@ export function computeRpgSheet(lifts: LiftScore[]): RpgSheet {
   }
 
   return { xp, level, levelProgress: progress, stats };
+}
+
+export type MuscleScore = { muscle: string; score: number; lifts: number };
+
+/** Score por grupo muscular: promedio ponderado (scoreWeight) de sus ejercicios registrados. */
+export function computeMuscleScores(lifts: LiftScore[]): MuscleScore[] {
+  const result: MuscleScore[] = [];
+  for (const muscle of MUSCLE_IDS) {
+    let sum = 0;
+    let weight = 0;
+    let count = 0;
+    for (const exercise of exercisesOfMuscle(muscle)) {
+      const lift = lifts.find((item) => item.lift === exercise.id);
+      if (!lift || lift.oneRm <= 0) continue;
+      sum += lift.score * exercise.scoreWeight;
+      weight += exercise.scoreWeight;
+      count += 1;
+    }
+    if (count > 0) result.push({ muscle, score: sum / (weight || 1), lifts: count });
+  }
+  return result;
 }

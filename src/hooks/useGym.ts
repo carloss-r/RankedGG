@@ -12,10 +12,13 @@ import {
   saveProfile,
 } from "../lib/db";
 import { bestOneRm, computeSnapshot } from "../lib/engine";
-import { ensureUser, leavePlayer, publishPlayer } from "../lib/firebase/leaderboard";
+import { ensureUser } from "../lib/firebase/auth";
+import { leavePlayer, publishPlayer } from "../lib/firebase/leaderboard";
+import { deleteRegistration, getRegistration, registerUser } from "../lib/firebase/users";
 import { toGlobalError } from "../lib/global/errors";
 import type { LeaderboardEntry } from "../lib/global/types";
 import { computeRpgSheet } from "../lib/rpg";
+import { baseVariant, isVariantId } from "../lib/catalog";
 import { epley1rm, LIFTS } from "../lib/standards";
 import type { LiftEntry, LiftId, Profile, Sex } from "../lib/types";
 
@@ -25,7 +28,7 @@ type GlobalSettings = { shareGlobally: boolean };
 
 export type GlobalSync = {
   status: "idle" | "syncing" | "ok" | "error";
-  /** Código de error (p. ej. auth_disabled, permission_denied, implausible_mark). */
+  /** Código de error (p. ej. auth_disabled, permission_denied, not_registered, implausible_mark). */
   error?: string;
   detail?: string;
   me?: LeaderboardEntry;
@@ -88,7 +91,7 @@ export function useGym() {
     const timer = window.setTimeout(async () => {
       setSync((prev) => ({ ...prev, status: "syncing" }));
       try {
-        const me = await publishPlayer({ profile, entries, bests });
+        const me = await publishPlayer({ profile, entries });
         if (cancelled) return;
         setPlayerId(me.id);
         setSync({ status: "ok", me });
@@ -105,17 +108,37 @@ export function useGym() {
     };
   }, [ready, shareGlobally, profile, entries, bests]);
 
-  const enableGlobal = useCallback(async () => {
+  async function activate(uid: string) {
     await saveMeta<GlobalSettings>(SETTINGS_KEY, { shareGlobally: true });
     setShareGlobally(true);
+    setPlayerId(uid);
+    setSync({ status: "idle" });
+  }
+
+  /**
+   * Paso 1 de "Participar": crea la sesión anónima y comprueba en la base si ya existe un registro.
+   * - "joined": ya estaba registrado, queda activo.
+   * - "needs_name": hay que pedir el nombre completo (completeJoin).
+   */
+  const beginJoin = useCallback(async (): Promise<"joined" | "needs_name" | "error"> => {
     try {
-      // Crea (o recupera) la sesión anónima para poder ver tu posición de inmediato.
       const user = await ensureUser();
-      setPlayerId(user.uid);
+      const registration = await getRegistration(user.uid);
+      if (!registration) return "needs_name";
+      await activate(user.uid);
+      return "joined";
     } catch (err) {
       const failure = toGlobalError(err);
       setSync({ status: "error", error: failure.code, detail: failure.detail });
+      return "error";
     }
+  }, []);
+
+  /** Paso 2: guarda el nombre completo en la base (verificando la escritura) y activa la participación. */
+  const completeJoin = useCallback(async (fullName: string) => {
+    await registerUser(fullName); // lanza GlobalError si el nombre no es válido o la base lo rechaza
+    const user = await ensureUser();
+    await activate(user.uid);
   }, []);
 
   const disableGlobal = useCallback(async () => {
@@ -146,10 +169,20 @@ export function useGym() {
   );
 
   const logLift = useCallback(
-    async (input: { lift: LiftId; weightKg: number; reps: number; date?: string }) => {
+    async (input: {
+      lift: LiftId;
+      variantId?: string;
+      weightKg: number;
+      reps: number;
+      date?: string;
+    }) => {
+      const variantId = isVariantId(input.lift, input.variantId)
+        ? input.variantId
+        : baseVariant(input.lift).id;
       const entry: LiftEntry = {
         id: crypto.randomUUID(),
         lift: input.lift,
+        variantId,
         weightKg: input.weightKg,
         reps: input.reps,
         estimated1rm: Math.round(epley1rm(input.weightKg, input.reps) * 10) / 10,
@@ -169,7 +202,9 @@ export function useGym() {
   const reset = useCallback(async () => {
     if (shareGlobally) {
       try {
+        // Primero los datos públicos (las reglas exigen estar registrado) y luego el registro.
         await leavePlayer();
+        await deleteRegistration();
       } catch {
         // Best effort: igualmente se borran los datos locales.
       }
@@ -192,7 +227,8 @@ export function useGym() {
     playerId,
     shareGlobally,
     sync,
-    enableGlobal,
+    beginJoin,
+    completeJoin,
     disableGlobal,
     upsertProfile,
     logLift,

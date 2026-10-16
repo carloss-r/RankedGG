@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatKg } from "../../lib/engine";
+import { variantById } from "../../lib/catalog";
+import { equivalent1rm, formatKg } from "../../lib/engine";
 import { LIFT_META, LIFTS } from "../../lib/standards";
 import type { LiftEntry, LiftId } from "../../lib/types";
 import { Glass } from "../ui";
@@ -28,7 +29,8 @@ export function ProgressScreen({ entries }: { entries: LiftEntry[] }) {
       .slice()
       .reverse();
   }, [entries, lift]);
-  const values = series.map((entry) => entry.estimated1rm);
+  // La curva usa el 1RM equivalente al ejercicio base para poder mezclar variantes.
+  const values = series.map((entry) => equivalent1rm(entry));
   const first = values[0] ?? 0;
   const last = values[values.length - 1] ?? 0;
   const delta = last - first;
@@ -58,7 +60,7 @@ export function ProgressScreen({ entries }: { entries: LiftEntry[] }) {
       <Glass className="px-4 py-5">
         <div className="flex items-end justify-between px-1">
           <div>
-            <p className="text-[13px] text-white/50">Mejor 1RM estimado</p>
+            <p className="text-[13px] text-white/50">1RM equivalente</p>
             <p className="text-[34px] font-semibold">{formatKg(last)}</p>
           </div>
           <p className={`text-[15px] ${delta >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
@@ -97,6 +99,9 @@ export function ProgressScreen({ entries }: { entries: LiftEntry[] }) {
               <div>
                 <p className="text-[16px] font-medium">
                   {entry.weightKg} kg × {entry.reps}
+                  <span className="ml-2 text-[12px] text-white/45">
+                    {variantById(entry.lift, entry.variantId).name}
+                  </span>
                 </p>
                 <p className="text-[12px] text-white/45">
                   {new Date(entry.date).toLocaleDateString("es", {
@@ -105,7 +110,7 @@ export function ProgressScreen({ entries }: { entries: LiftEntry[] }) {
                   })}
                 </p>
               </div>
-              <p className="text-[14px] text-white/60">1RM {formatKg(entry.estimated1rm)}</p>
+              <p className="text-[14px] text-white/60">1RM {formatKg(equivalent1rm(entry))}</p>
             </Glass>
           ))}
       </div>

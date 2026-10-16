@@ -1,4 +1,4 @@
-import { LEVELS } from "./catalog";
+import { LEVELS, variantById, variantsOf } from "./catalog";
 import { nextRankFromScore, rankFromScore } from "./ranks";
 import {
   expectedLevels,
@@ -62,10 +62,35 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+/** 1RM de una marca expresado como equivalente del ejercicio base (comparable con las tablas). */
+export function equivalent1rm(entry: Pick<LiftEntry, "lift" | "variantId" | "estimated1rm">) {
+  const factor = variantById(entry.lift, entry.variantId).factor || 1;
+  return entry.estimated1rm / factor;
+}
+
+/** Mejor 1RM equivalente del ejercicio (considerando todas sus variantes). */
 export function bestOneRm(entries: LiftEntry[], lift: LiftId) {
   return entries
     .filter((entry) => entry.lift === lift)
-    .reduce((max, entry) => Math.max(max, entry.estimated1rm), 0);
+    .reduce((max, entry) => Math.max(max, equivalent1rm(entry)), 0);
+}
+
+/** Mejor marca por variante: valor real de la variante y su equivalente en el ejercicio base. */
+export function bestByVariant(entries: LiftEntry[], lift: LiftId) {
+  const result: Record<string, { raw: number; equivalent: number }> = {};
+  for (const variant of variantsOf(lift)) {
+    const raw = entries
+      .filter((entry) => entry.lift === lift && variantById(lift, entry.variantId).id === variant.id)
+      .reduce((max, entry) => Math.max(max, entry.estimated1rm), 0);
+    if (raw > 0) result[variant.id] = { raw, equivalent: raw / (variant.factor || 1) };
+  }
+  return result;
+}
+
+/** Score (0-100) de un 1RM equivalente para este perfil y ejercicio. */
+export function scoreLift(profile: Profile, lift: LiftId, oneRm: number) {
+  const rated = scoreFromOneRm(oneRm, expectedLevels(profile.sex, lift, profile.bodyweightKg));
+  return { score: rated.score, percentile: rated.percentile, levelLabel: LEVEL_LABELS[rated.levelIndex] };
 }
 
 export function computeSnapshot(

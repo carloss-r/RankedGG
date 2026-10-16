@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "levels": {
     "labels": [
       "Sin entrenar",
@@ -74,6 +74,24 @@
       "scoreWeight": 0.3,
       "xpMultiplier": 1.2,
       "unit": "kg",
+      "muscle": "legs",
+      "variants": [
+        {
+          "id": "back",
+          "name": "Sentadilla trasera",
+          "factor": 1
+        },
+        {
+          "id": "front",
+          "name": "Sentadilla frontal",
+          "factor": 0.85
+        },
+        {
+          "id": "smith",
+          "name": "Sentadilla en Smith",
+          "factor": 1.05
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -295,6 +313,30 @@
       "scoreWeight": 0.25,
       "xpMultiplier": 1.1,
       "unit": "kg",
+      "muscle": "chest",
+      "variants": [
+        {
+          "id": "barbell",
+          "name": "Press banca con barra",
+          "factor": 1
+        },
+        {
+          "id": "incline",
+          "name": "Press inclinado con barra",
+          "factor": 0.8
+        },
+        {
+          "id": "closegrip",
+          "name": "Press agarre cerrado",
+          "factor": 0.9
+        },
+        {
+          "id": "dumbbell",
+          "name": "Press con mancuernas",
+          "factor": 0.37,
+          "note": "Peso por mancuerna"
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -516,6 +558,29 @@
       "scoreWeight": 0.3,
       "xpMultiplier": 1.2,
       "unit": "kg",
+      "muscle": "back",
+      "variants": [
+        {
+          "id": "conventional",
+          "name": "Peso muerto convencional",
+          "factor": 1
+        },
+        {
+          "id": "sumo",
+          "name": "Peso muerto sumo",
+          "factor": 1
+        },
+        {
+          "id": "trapbar",
+          "name": "Peso muerto con barra hexagonal",
+          "factor": 1.1
+        },
+        {
+          "id": "romanian",
+          "name": "Peso muerto rumano",
+          "factor": 0.75
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -737,6 +802,25 @@
       "scoreWeight": 0.15,
       "xpMultiplier": 1,
       "unit": "kg",
+      "muscle": "shoulders",
+      "variants": [
+        {
+          "id": "standing",
+          "name": "Press militar de pie",
+          "factor": 1
+        },
+        {
+          "id": "seated",
+          "name": "Press militar sentado",
+          "factor": 0.92
+        },
+        {
+          "id": "dumbbell",
+          "name": "Press militar con mancuernas",
+          "factor": 0.38,
+          "note": "Peso por mancuerna"
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -958,6 +1042,25 @@
       "scoreWeight": 0.1,
       "xpMultiplier": 0.9,
       "unit": "kg",
+      "muscle": "back",
+      "variants": [
+        {
+          "id": "barbell",
+          "name": "Remo con barra",
+          "factor": 1
+        },
+        {
+          "id": "pendlay",
+          "name": "Remo Pendlay",
+          "factor": 0.95
+        },
+        {
+          "id": "dumbbell",
+          "name": "Remo con mancuerna",
+          "factor": 0.4,
+          "note": "Peso por mancuerna"
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -1179,6 +1282,19 @@
       "scoreWeight": 0.08,
       "xpMultiplier": 0.9,
       "unit": "kg",
+      "muscle": "back",
+      "variants": [
+        {
+          "id": "pullup",
+          "name": "Dominada pronada",
+          "factor": 1
+        },
+        {
+          "id": "chinup",
+          "name": "Dominada supina (chin-up)",
+          "factor": 1.05
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -1400,6 +1516,25 @@
       "scoreWeight": 0.06,
       "xpMultiplier": 0.6,
       "unit": "kg",
+      "muscle": "arms",
+      "variants": [
+        {
+          "id": "barbell",
+          "name": "Curl con barra recta",
+          "factor": 1
+        },
+        {
+          "id": "ez",
+          "name": "Curl con barra Z",
+          "factor": 0.95
+        },
+        {
+          "id": "dumbbell",
+          "name": "Curl con mancuernas",
+          "factor": 0.4,
+          "note": "Peso por mancuerna"
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -1621,6 +1756,20 @@
       "scoreWeight": 0.06,
       "xpMultiplier": 0.6,
       "unit": "kg",
+      "muscle": "arms",
+      "variants": [
+        {
+          "id": "standard",
+          "name": "Extensión de tríceps",
+          "factor": 1
+        },
+        {
+          "id": "dumbbell",
+          "name": "Extensión sobre la cabeza con mancuerna",
+          "factor": 0.4,
+          "note": "Peso de la mancuerna"
+        }
+      ],
       "standards": {
         "male": [
           {
@@ -1832,5 +1981,22 @@
         ]
       }
     }
-  ]
+  ],
+  "muscles": {
+    "legs": {
+      "name": "Piernas"
+    },
+    "chest": {
+      "name": "Pecho"
+    },
+    "back": {
+      "name": "Espalda"
+    },
+    "shoulders": {
+      "name": "Hombros"
+    },
+    "arms": {
+      "name": "Brazos"
+    }
+  }
 }

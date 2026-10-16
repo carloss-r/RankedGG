@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useGym } from "../hooks/useGym";
+import { JoinSheet } from "./JoinSheet";
 import { Onboarding } from "./Onboarding";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LeaderboardScreen } from "./screens/LeaderboardScreen";
@@ -27,6 +28,13 @@ export function GymApp() {
   const gym = useGym();
   const [tab, setTab] = useState<TabId>("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
+
+  /** "Participar": si la base ya tiene tu registro entras directo; si no, se pide el nombre completo. */
+  async function requestJoin() {
+    const result = await gym.beginJoin();
+    if (result === "needs_name") setJoinOpen(true);
+  }
 
   if (!gym.ready) {
     return (
@@ -66,7 +74,7 @@ export function GymApp() {
             shareGlobally={gym.shareGlobally}
             sync={gym.sync}
             hasMarks={gym.entries.length > 0}
-            onEnable={gym.enableGlobal}
+            onJoin={requestJoin}
           />
         )}
         {tab === "log" && (
@@ -80,7 +88,7 @@ export function GymApp() {
             shareGlobally={gym.shareGlobally}
             sync={gym.sync}
             onToggleGlobal={async (on) => {
-              if (on) await gym.enableGlobal();
+              if (on) await requestJoin();
               else await gym.disableGlobal();
             }}
             onSave={gym.upsertProfile}
@@ -91,6 +99,14 @@ export function GymApp() {
           />
         )}
       </main>
+
+      {joinOpen && (
+        <JoinSheet
+          initialName={gym.profile.name}
+          onSubmit={gym.completeJoin}
+          onClose={() => setJoinOpen(false)}
+        />
+      )}
 
       {/* Floating menu button */}
       <button

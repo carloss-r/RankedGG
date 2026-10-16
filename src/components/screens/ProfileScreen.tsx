@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { GlobalSync } from "../../hooks/useGym";
 import type { Profile, Sex } from "../../lib/types";
 import { Field, Glass, PrimaryButton, TextInput } from "../ui";
-import { errorMessage } from "./LeaderboardScreen";
+import { errorMessage } from "../../lib/global/messages";
 
 export function ProfileScreen({
   profile,

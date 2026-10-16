@@ -7,12 +7,28 @@ export type RpgStatId = string;
 
 export type BwRow = { bw: number; levels: number[] };
 
+export type MuscleId = string;
+
+export type MuscleDef = { name: string };
+
+export type VariantDef = {
+  id: string;
+  name: string;
+  /** 1RM de la variante ÷ 1RM del ejercicio base (aprox.). La primera variante es la base (1). */
+  factor: number;
+  /** Aclaración de carga, p. ej. "Peso por mancuerna". */
+  note?: string;
+};
+
 export type ExerciseDef = {
   id: LiftId;
   name: string;
   short: string;
   category: "compound" | "isolation" | "bodyweight";
   pattern: string;
+  /** Grupo muscular principal (clave de `muscles` en el JSON). */
+  muscle: MuscleId;
+  variants: VariantDef[];
   /** Atributo RPG al que aporta (STR, VIT, AGI...). */
   stat: RpgStatId;
   /** Peso del ejercicio dentro del score global (0-1). */
@@ -55,6 +71,8 @@ export type Profile = {
 export type LiftEntry = {
   id: string;
   lift: LiftId;
+  /** Variante del ejercicio. Si falta (marcas antiguas) se usa la base. */
+  variantId?: string;
   weightKg: number;
   reps: number;
   estimated1rm: number;

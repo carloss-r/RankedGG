@@ -2,16 +2,41 @@
   "rules": {
     ".read": false,
     ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['fullName','publicName','status','createdAt','updatedAt'])",
+        "fullName": {
+          ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 80"
+        },
+        "publicName": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40"
+        },
+        "status": {
+          ".validate": "newData.isString() && newData.val() === 'active'"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
     "players": {
       ".read": true,
       ".indexOn": [
         "score"
       ],
       "$uid": {
-        ".write": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
         ".validate": "newData.hasChildren(['name','rankId','level','xp','score','percentile','updatedAt','bests'])",
         "name": {
-          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
         },
         "rankId": {
           ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -65,6 +90,147 @@
         }
       }
     },
+    "muscles": {
+      ".read": true,
+      "legs": {
+        ".indexOn": [
+          "score"
+        ],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+          ".validate": "newData.hasChildren(['name','rankId','level','score','lifts'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+          },
+          "rankId": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+          },
+          "level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+          },
+          "score": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+          },
+          "lifts": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 1"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "chest": {
+        ".indexOn": [
+          "score"
+        ],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+          ".validate": "newData.hasChildren(['name','rankId','level','score','lifts'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+          },
+          "rankId": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+          },
+          "level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+          },
+          "score": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+          },
+          "lifts": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 1"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "back": {
+        ".indexOn": [
+          "score"
+        ],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+          ".validate": "newData.hasChildren(['name','rankId','level','score','lifts'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+          },
+          "rankId": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+          },
+          "level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+          },
+          "score": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+          },
+          "lifts": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 3"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "shoulders": {
+        ".indexOn": [
+          "score"
+        ],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+          ".validate": "newData.hasChildren(['name','rankId','level','score','lifts'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+          },
+          "rankId": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+          },
+          "level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+          },
+          "score": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+          },
+          "lifts": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 1"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "arms": {
+        ".indexOn": [
+          "score"
+        ],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+          ".validate": "newData.hasChildren(['name','rankId','level','score','lifts'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+          },
+          "rankId": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+          },
+          "level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+          },
+          "score": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+          },
+          "lifts": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 2"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "$other": {
+        ".validate": false
+      }
+    },
     "lifts": {
       ".read": true,
       "squat": {
@@ -72,10 +238,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -99,10 +265,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -126,10 +292,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -153,10 +319,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -180,10 +346,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -207,10 +373,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -234,10 +400,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -261,10 +427,10 @@
           "score"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
           ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
           "name": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
           },
           "rankId": {
             ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
@@ -281,6 +447,700 @@
           "$other": {
             ".validate": false
           }
+        }
+      },
+      "$other": {
+        ".validate": false
+      }
+    },
+    "variants": {
+      ".read": true,
+      "squat": {
+        "back": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 611"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "front": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 611"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "smith": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 642"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "bench": {
+        "barbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 460"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "incline": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 460"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "closegrip": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 460"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "dumbbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 460"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "deadlift": {
+        "conventional": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 746"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "sumo": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 746"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "trapbar": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 821"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "romanian": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 746"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "ohp": {
+        "standing": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 265"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "seated": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 265"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "dumbbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 265"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "row": {
+        "barbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 449"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "pendlay": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 449"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "dumbbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 449"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "pullup": {
+        "pullup": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 196"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "chinup": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 206"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "curl": {
+        "barbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 214"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "ez": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 214"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "dumbbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 214"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "tricep": {
+        "standard": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 225"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "dumbbell": {
+          ".indexOn": [
+            "score"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child(auth.uid).child('status').val() === 'active')",
+            ".validate": "newData.hasChildren(['name','rankId','level','score','oneRm'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40 && newData.val() === root.child('users').child($uid).child('publicName').val()"
+            },
+            "rankId": {
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z]{3,12}$/)"
+            },
+            "level": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "oneRm": {
+              ".validate": "newData.isNumber() && newData.val() >= 0.1 && newData.val() <= 225"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
         }
       },
       "$other": {
