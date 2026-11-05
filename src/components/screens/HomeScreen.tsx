@@ -3,16 +3,18 @@
 import { useEffect, useState } from "react";
 import { formatKg, formatPercent } from "../../lib/engine";
 import { getRandomQuote } from "../../lib/quotes";
-import { LIFT_META } from "../../lib/standards";
-import type { Profile, RankSnapshot } from "../../lib/types";
+import { shortName } from "../../lib/exercises";
+import type { Exercise, LiftId, Profile, RankSnapshot } from "../../lib/types";
 import { Glass } from "../ui";
 
 export function HomeScreen({
   profile,
   snapshot,
+  getExercise,
 }: {
   profile: Profile;
   snapshot: RankSnapshot;
+  getExercise: (id: LiftId) => Exercise | undefined;
 }) {
   const [quote, setQuote] = useState(getRandomQuote());
 
@@ -29,7 +31,7 @@ export function HomeScreen({
   const weakest = [...logged].sort((a, b) => a.score - b.score)[0];
   const nextNeed =
     snapshot.nextRank && weakest?.nextKg
-      ? `Para ${snapshot.nextRank.name}, acerca ${LIFT_META[weakest.lift].short.toLowerCase()} a ${formatKg(weakest.nextKg)}.`
+      ? `Para ${snapshot.nextRank.name}, acerca ${shortName(weakest.lift, getExercise(weakest.lift)).toLowerCase()} a ${formatKg(weakest.nextKg)}.`
       : snapshot.nextRank
         ? `Sigue subiendo marcas para alcanzar ${snapshot.nextRank.name}.`
         : "Estás en la cima del ranking.";
@@ -119,7 +121,9 @@ export function HomeScreen({
       <div className="grid grid-cols-2 gap-3">
         {snapshot.lifts.map((lift) => (
           <Glass key={lift.lift} className="px-4 py-4 text-left">
-            <p className="text-[12px] text-white/45">{LIFT_META[lift.lift].short}</p>
+            <p className="truncate text-[12px] text-white/45">
+              {shortName(lift.lift, getExercise(lift.lift))}
+            </p>
             <p className="mt-1 text-[22px] font-semibold">{formatKg(lift.oneRm)}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
               <div

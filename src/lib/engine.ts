@@ -7,15 +7,48 @@ import {
   LIFTS,
 } from "./standards";
 import type {
+  CoreLiftId,
+  Exercise,
   LiftEntry,
   LiftId,
   LiftScore,
   Profile,
   RankSnapshot,
+  Sex,
 } from "./types";
+
+export type ExerciseResolver = (id: LiftId) => Exercise | undefined;
+
+/** Peso en el rango de cada ejercicio extra (los 8 base tienen el suyo). */
+export const EXTRA_WEIGHT = 0.03;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+export function isCoreId(id: LiftId): id is CoreLiftId {
+  return (LIFTS as string[]).includes(id);
+}
+
+/**
+ * Niveles esperados (sin entrenar → clase mundial) de un ejercicio. Los base
+ * usan su tabla; los extras, la de su ejercicio de referencia × factor.
+ * Devuelve null si el ejercicio solo se registra y no se puntúa.
+ */
+export function levelsFor(
+  sex: Sex,
+  id: LiftId,
+  exercise: Exercise | undefined,
+  bodyweightKg: number,
+): number[] | null {
+  if (isCoreId(id)) return expectedLevels(sex, id, bodyweightKg);
+  if (!exercise?.ref) return null;
+  const { lift, factor } = exercise.ref;
+  return expectedLevels(sex, lift, bodyweightKg).map((value) => value * factor);
 }
 
 function scoreFromOneRm(oneRm: number, levels: number[]) {
@@ -57,51 +90,64 @@ function scoreFromOneRm(oneRm: number, levels: number[]) {
   };
 }
 
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
-
 export function bestOneRm(entries: LiftEntry[], lift: LiftId) {
   return entries
     .filter((entry) => entry.lift === lift)
     .reduce((max, entry) => Math.max(max, entry.estimated1rm), 0);
 }
 
+function weightOf(id: LiftId) {
+  return isCoreId(id) ? LIFT_META[id].weight : EXTRA_WEIGHT;
+}
+
 export function computeSnapshot(
   profile: Profile | null,
   entries: LiftEntry[],
+  resolve: ExerciseResolver,
 ): RankSnapshot | null {
   if (!profile) return null;
 
-  const lifts: LiftScore[] = LIFTS.map((lift) => {
-    const oneRm = bestOneRm(entries, lift);
-    const levels = expectedLevels(profile.sex, lift, profile.bodyweightKg);
+  // Siempre los 8 base; de los extras, solo los que tienen 1RM registrado.
+  const extraIds = Array.from(
+    new Set(entries.map((entry) => entry.lift).filter((id) => !isCoreId(id))),
+  );
+
+  const build = (id: LiftId): LiftScore | null => {
+    const levels = levelsFor(profile.sex, id, resolve(id), profile.bodyweightKg);
+    if (!levels) return null;
+    const oneRm = bestOneRm(entries, id);
+    if (!isCoreId(id) && oneRm <= 0) return null;
     const rated = scoreFromOneRm(oneRm, levels);
     return {
-      lift,
+      lift: id,
       oneRm,
       score: rated.score,
       percentile: rated.percentile,
       levelLabel: LEVEL_LABELS[rated.levelIndex],
       nextKg: rated.nextKg,
     };
-  });
+  };
+
+  const core = LIFTS.map(build).filter((item): item is LiftScore => item !== null);
+  const extras = extraIds
+    .map(build)
+    .filter((item): item is LiftScore => item !== null)
+    .sort((a, b) => b.score - a.score);
+  const lifts = [...core, ...extras];
 
   const logged = lifts.filter((lift) => lift.oneRm > 0);
-  const totalWeight = logged.reduce((sum, lift) => sum + LIFT_META[lift.lift].weight, 0);
+  const totalWeight = logged.reduce((sum, lift) => sum + weightOf(lift.lift), 0);
   const score =
     logged.length === 0
       ? 0
-      : logged.reduce((sum, lift) => sum + lift.score * LIFT_META[lift.lift].weight, 0) /
+      : logged.reduce((sum, lift) => sum + lift.score * weightOf(lift.lift), 0) /
         (totalWeight || 1);
 
   const percentile =
     logged.length === 0
       ? 0
-      : logged.reduce(
-          (sum, lift) => sum + lift.percentile * LIFT_META[lift.lift].weight,
-          0,
-        ) / (totalWeight || 1);
+      : logged.reduce((sum, lift) => sum + lift.percentile * weightOf(lift.lift), 0) /
+        (totalWeight || 1);
 
   const rank = rankFromScore(score);
   const nextRank = nextRankFromScore(score);

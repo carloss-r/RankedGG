@@ -49,12 +49,20 @@ export function TextInput({
   placeholder,
   type = "text",
   inputMode,
+  maxLength,
+  autoComplete,
+  autoFocus,
+  onEnter,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   type?: string;
   inputMode?: "decimal" | "numeric" | "text";
+  maxLength?: number;
+  autoComplete?: string;
+  autoFocus?: boolean;
+  onEnter?: () => void;
 }) {
   return (
     <input
@@ -62,9 +70,37 @@ export function TextInput({
       type={type}
       inputMode={inputMode}
       placeholder={placeholder}
+      maxLength={maxLength}
+      autoComplete={autoComplete}
+      autoFocus={autoFocus}
       onChange={(event) => onChange(event.target.value)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && onEnter) onEnter();
+      }}
       className="h-14 w-full rounded-2xl border border-white/12 bg-white/8 px-4 text-[17px] text-white outline-none placeholder:text-white/30"
     />
+  );
+}
+
+export function ErrorNote({ children }: { children: ReactNode }) {
+  return (
+    <p
+      role="alert"
+      className="rounded-2xl bg-rose-500/15 px-4 py-3 text-[14px] leading-5 text-rose-200"
+    >
+      {children}
+    </p>
+  );
+}
+
+export function SuccessNote({ children }: { children: ReactNode }) {
+  return (
+    <p
+      role="status"
+      className="rounded-2xl bg-emerald-500/15 px-4 py-3 text-[14px] leading-5 text-emerald-200"
+    >
+      {children}
+    </p>
   );
 }
 

@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth, type AuthApi } from "../hooks/useAuth";
 import { useGym } from "../hooks/useGym";
-import { Onboarding } from "./Onboarding";
+import { cleanName } from "../lib/auth";
+import type { Account } from "../lib/types";
+import { AuthScreen } from "./AuthScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LogScreen } from "./screens/LogScreen";
 import { ManualScreen } from "./screens/ManualScreen";
@@ -21,53 +24,114 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+function Loading() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center">
+      <div className="text-center">
+        <p className="text-[13px] tracking-[0.24em] text-white/40 uppercase">RankedGG</p>
+        <p className="mt-3 text-[28px] font-semibold">Cargando</p>
+      </div>
+    </div>
+  );
+}
+
+function Failure({ message, onLogout }: { message: string; onLogout?: () => void }) {
+  return (
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-5 px-6 text-center">
+      <p className="text-[13px] tracking-[0.24em] text-white/40 uppercase">RankedGG</p>
+      <h1 className="text-[26px] font-semibold tracking-tight">Algo salió mal</h1>
+      <p role="alert" className="text-[15px] leading-6 text-white/65">
+        {message}
+      </p>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="h-12 rounded-full bg-white px-6 text-[15px] font-semibold text-black"
+        >
+          Reintentar
+        </button>
+        {onLogout && (
+          <button
+            type="button"
+            onClick={onLogout}
+            className="h-12 rounded-full border border-white/20 px-6 text-[15px] text-white/80"
+          >
+            Cerrar sesión
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function GymApp() {
-  const gym = useGym();
+  const auth = useAuth();
+
+  if (!auth.ready) return <Loading />;
+  if (auth.error) return <Failure message={auth.error} />;
+  if (!auth.account) return <AuthScreen auth={auth} />;
+
+  // `key` reinicia todo el estado al cambiar de cuenta.
+  return <GymMain key={auth.account.id} account={auth.account} auth={auth} />;
+}
+
+function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
+  const gym = useGym(account.id, account.name);
   const [tab, setTab] = useState<TabId>("home");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  if (!gym.ready) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center">
-        <div className="text-center">
-          <p className="text-[13px] tracking-[0.24em] text-white/40 uppercase">RankedGG</p>
-          <p className="mt-3 text-[28px] font-semibold">Cargando</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!gym.profile || !gym.snapshot) {
-    return (
-      <Onboarding
-        onComplete={async ({ name, sex, bodyweightKg, marks }) => {
-          await gym.upsertProfile({ name, sex, bodyweightKg });
-          for (const mark of marks) {
-            await gym.logLift({ lift: mark.lift, weightKg: mark.weightKg, reps: 1 });
-          }
-        }}
-      />
-    );
-  }
+  if (gym.error) return <Failure message={gym.error} onLogout={() => void auth.logout()} />;
+  if (!gym.ready || !gym.profile || !gym.snapshot) return <Loading />;
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
-      <main className="flex-1 px-5 pt-[calc(var(--safe-top)+18px)] pb-[calc(20px+var(--safe-bottom))]">
-        {tab === "home" && <HomeScreen profile={gym.profile} snapshot={gym.snapshot} />}
-        {tab === "progress" && <ProgressScreen entries={gym.entries} />}
+      <main className="flex-1 px-5 pt-[calc(var(--safe-top)+18px)] pb-[calc(96px+var(--safe-bottom))]">
+        {tab === "home" && (
+          <HomeScreen
+            profile={gym.profile}
+            snapshot={gym.snapshot}
+            getExercise={gym.getExercise}
+          />
+        )}
+        {tab === "progress" && (
+          <ProgressScreen entries={gym.entries} getExercise={gym.getExercise} />
+        )}
         {tab === "ranks" && <RanksScreen snapshot={gym.snapshot} />}
         {tab === "log" && (
-          <LogScreen entries={gym.entries} onLog={gym.logLift} onDelete={gym.removeLift} />
+          <LogScreen
+            entries={gym.entries}
+            sessions={gym.sessions}
+            activeSession={gym.activeSession}
+            exercises={gym.exercises}
+            getExercise={gym.getExercise}
+            onLog={gym.logLift}
+            onDelete={gym.removeLift}
+            onStart={gym.startSession}
+            onEnd={gym.endSession}
+            onCreateExercise={gym.addCustomExercise}
+          />
         )}
         {tab === "manual" && <ManualScreen />}
         {tab === "profile" && (
           <ProfileScreen
+            account={account}
             profile={gym.profile}
             entriesCount={gym.entries.length}
-            onSave={gym.upsertProfile}
-            onReset={async () => {
-              await gym.reset();
-              setTab("home");
+            sessionsCount={gym.sessions.filter((item) => gym.entries.some((e) => e.sessionId === item.id)).length}
+            onSave={async (input) => {
+              // El nombre del perfil y el de la cuenta (el que se ve al entrar) van juntos.
+              if ((cleanName(input.name) || "Atleta") !== account.name) {
+                await auth.renameAccount(input.name);
+              }
+              await gym.upsertProfile(input);
+            }}
+            onLogout={async () => {
+              await auth.logout();
+            }}
+            onChangePin={auth.changePin}
+            onDeleteAccount={async () => {
+              await auth.removeAccount(account.id);
             }}
           />
         )}
@@ -76,6 +140,8 @@ export function GymApp() {
       {/* Floating menu button */}
       <button
         type="button"
+        aria-label="Abrir menú"
+        aria-expanded={menuOpen}
         onClick={() => setMenuOpen(!menuOpen)}
         className="glass-strong fixed bottom-6 right-6 z-30 flex h-16 w-16 items-center justify-center rounded-full border border-white/20 shadow-2xl"
       >

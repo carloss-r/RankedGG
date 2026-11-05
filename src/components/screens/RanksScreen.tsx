@@ -14,7 +14,8 @@ export function RanksScreen({ snapshot }: { snapshot: RankSnapshot }) {
         <h1 className="mt-1 text-[32px] font-semibold tracking-tight">Rangos RPG</h1>
         <p className="mt-2 text-[15px] leading-6 text-white/60">
           De Madera a Mr Olympia. Cada rango compara tus 1RM con tablas mundiales de
-          sentadilla, banca, peso muerto y press militar.
+          sentadilla, banca, peso muerto y press militar, más tus ejercicios
+          complementarios.
         </p>
       </header>
 

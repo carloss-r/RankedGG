@@ -1,9 +1,9 @@
-import type { LiftId, Sex } from "./types";
+import type { CoreLiftId, Sex } from "./types";
 
 /** 1RM estimado (kg) por peso corporal. Niveles: untrained → world class. */
 type BwRow = { bw: number; levels: number[] };
 
-const MALE: Record<LiftId, BwRow[]> = {
+const MALE: Record<CoreLiftId, BwRow[]> = {
   squat: [
     { bw: 52, levels: [22, 38, 58, 85, 118, 152, 185] },
     { bw: 60, levels: [28, 48, 74, 108, 148, 190, 228] },
@@ -94,7 +94,7 @@ const MALE: Record<LiftId, BwRow[]> = {
   ],
 };
 
-const FEMALE: Record<LiftId, BwRow[]> = {
+const FEMALE: Record<CoreLiftId, BwRow[]> = {
   squat: [
     { bw: 44, levels: [14, 24, 38, 56, 78, 102, 125] },
     { bw: 52, levels: [18, 30, 48, 70, 96, 124, 150] },
@@ -190,7 +190,7 @@ export const LEVEL_LABELS = [
 export const LEVEL_PERCENTILES = [5, 15, 35, 55, 80, 95, 99.4];
 
 export const LIFT_META: Record<
-  LiftId,
+  CoreLiftId,
   { name: string; short: string; weight: number }
 > = {
   squat: { name: "Sentadilla", short: "Sentadilla", weight: 0.3 },
@@ -203,13 +203,23 @@ export const LIFT_META: Record<
   tricep: { name: "Extensiones tríceps", short: "Tríceps", weight: 0.06 },
 };
 
-export const LIFTS: LiftId[] = ["squat", "bench", "deadlift", "ohp", "row", "pullup", "curl", "tricep"];
+/** Los 8 ejercicios base (los únicos con tabla propia de estándares). */
+export const LIFTS: CoreLiftId[] = [
+  "squat",
+  "bench",
+  "deadlift",
+  "ohp",
+  "row",
+  "pullup",
+  "curl",
+  "tricep",
+];
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
-export function expectedLevels(sex: Sex, lift: LiftId, bodyweightKg: number) {
+export function expectedLevels(sex: Sex, lift: CoreLiftId, bodyweightKg: number) {
   const table = sex === "male" ? MALE[lift] : FEMALE[lift];
   const bw = Math.max(table[0].bw, Math.min(table[table.length - 1].bw, bodyweightKg));
 
@@ -223,7 +233,11 @@ export function expectedLevels(sex: Sex, lift: LiftId, bodyweightKg: number) {
   return a.levels.map((value, index) => lerp(value, b.levels[index], t));
 }
 
+/** Más allá de 30 reps la fórmula de Epley deja de ser fiable. */
+export const EPLEY_MAX_REPS = 30;
+
 export function epley1rm(weightKg: number, reps: number) {
-  if (reps <= 1) return weightKg;
-  return weightKg * (1 + reps / 30);
+  const effective = Math.min(reps, EPLEY_MAX_REPS);
+  if (effective <= 1) return weightKg;
+  return weightKg * (1 + effective / 30);
 }
