@@ -5,6 +5,7 @@ import { formatKg, formatPercent } from "../../lib/engine";
 import { getRandomQuote } from "../../lib/quotes";
 import { shortName } from "../../lib/exercises";
 import type { Exercise, LiftId, Profile, RankSnapshot } from "../../lib/types";
+import { RankBadge } from "../RankBadge";
 import { Glass } from "../ui";
 
 export function HomeScreen({
@@ -86,7 +87,12 @@ export function HomeScreen({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[28px] leading-none">{snapshot.rank.icon}</span>
+              <RankBadge
+                rankId={snapshot.rank.id}
+                size={86}
+                glow={snapshot.rank.glow}
+                className="rg-float"
+              />
             </div>
           </div>
           <div>
@@ -132,9 +138,12 @@ export function HomeScreen({
       <div className="grid grid-cols-2 gap-3">
         {snapshot.lifts.map((lift) => (
           <Glass key={lift.lift} className="px-4 py-4 text-left">
-            <p className="truncate text-[12px] text-white/45">
-              {shortName(lift.lift, getExercise(lift.lift))}
-            </p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-[12px] text-white/45">
+                {shortName(lift.lift, getExercise(lift.lift))}
+              </p>
+              <RankBadge rankId={lift.standing.rank.id} size={26} locked={lift.oneRm <= 0} />
+            </div>
             <p className="mt-1 text-[22px] font-semibold">{formatKg(lift.oneRm)}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
               <div

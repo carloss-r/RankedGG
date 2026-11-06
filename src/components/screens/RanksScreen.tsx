@@ -5,6 +5,8 @@ import { ceilToHalf, formatKg, levelsFor, rankLadder } from "../../lib/engine";
 import { shortName } from "../../lib/exercises";
 import { RANKS, SHARE_MIN_SCORE } from "../../lib/ranks";
 import type { Exercise, LiftId, Profile, RankSnapshot } from "../../lib/types";
+import { RankBadge } from "../RankBadge";
+import { RankRoad } from "../RankRoad";
 import { Glass } from "../ui";
 
 export function RanksScreen({
@@ -50,7 +52,7 @@ export function RanksScreen({
         />
         <p className="text-[12px] tracking-[0.16em] text-white/45 uppercase">Rango general</p>
         <div className="mt-2 flex items-center gap-3">
-          <span className="text-[44px] leading-none">{general.rank.icon}</span>
+          <RankBadge rankId={general.rank.id} size={72} glow={general.rank.glow} className="rg-float" />
           <div>
             <p className="text-[28px] leading-none font-semibold" style={{ color: general.rank.color }}>
               {general.label}
@@ -68,6 +70,13 @@ export function RanksScreen({
           {canShareGeneral ? "Compartir mi rango" : "🔒 Compartir (desde Bronce)"}
         </button>
       </Glass>
+
+      <section className="flex flex-col gap-1">
+        <h2 className="px-1 text-[12px] tracking-[0.16em] text-white/45 uppercase">
+          Camino de rangos · desde Madera
+        </h2>
+        <RankRoad currentId={general.rank.id} />
+      </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="px-1 text-[12px] tracking-[0.16em] text-white/45 uppercase">
@@ -107,7 +116,12 @@ export function RanksScreen({
                   </p>
                 )}
               </div>
-              <span className="text-[40px]">{lift.oneRm > 0 ? standing.rank.icon : "—"}</span>
+              <RankBadge
+                rankId={standing.rank.id}
+                size={64}
+                locked={lift.oneRm <= 0}
+                glow={lift.oneRm > 0 ? standing.rank.glow : undefined}
+              />
             </div>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
               <div
@@ -139,12 +153,7 @@ export function RanksScreen({
                 style={{ opacity: reached ? 1 : 0.55 }}
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-[19px]"
-                    style={{ background: reached ? rank.glow : "rgba(255,255,255,0.06)" }}
-                  >
-                    {rank.icon}
-                  </div>
+                  <RankBadge rankId={rank.id} size={46} locked={!reached} />
                   <div className="min-w-0 flex-1">
                     <p className="text-[16px] font-semibold">{rank.name}</p>
                     <p className="truncate text-[12px] text-white/50">{rank.subtitle}</p>

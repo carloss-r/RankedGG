@@ -12,7 +12,7 @@ import {
   saveProfile,
   saveWorkoutSession,
 } from "../lib/db";
-import { computeSnapshot } from "../lib/engine";
+import { computeSnapshot, detectRecord } from "../lib/engine";
 import {
   EXERCISES,
   EXERCISE_MAP,
@@ -29,6 +29,7 @@ import type {
   LiftId,
   MuscleGroup,
   Profile,
+  RecordEvent,
   Sex,
   WorkoutSession,
 } from "../lib/types";
@@ -205,7 +206,7 @@ export function useGym(accountId: string, accountName: string) {
 
   const logLift = useCallback(
     (input: { lift: LiftId; weightKg: number; reps: number }) =>
-      serialize(lock, async () => {
+      serialize(lock, async (): Promise<{ entry: LiftEntry; record: RecordEvent | null }> => {
         const now = Date.now();
         const session = await ensureSession(now);
         const entry: LiftEntry = {
@@ -218,11 +219,13 @@ export function useGym(accountId: string, accountName: string) {
           estimated1rm: estimateOneRm(getExercise(input.lift), input.weightKg, input.reps),
           date: new Date(now).toISOString(),
         };
+        const before = entriesRef.current;
         await addLift(entry);
-        commitEntries([entry, ...entriesRef.current]);
-        return entry;
+        commitEntries([entry, ...before]);
+        const record = profile ? detectRecord(profile, before, entry, getExercise) : null;
+        return { entry, record };
       }),
-    [accountId, commitEntries, ensureSession, getExercise],
+    [accountId, commitEntries, ensureSession, getExercise, profile],
   );
 
   const removeLift = useCallback(

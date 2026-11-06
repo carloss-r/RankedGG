@@ -6,10 +6,10 @@ Pensada para el teléfono: interfaz liquid glass, 100% responsive y datos guarda
 
 ## Qué hace
 
-- Muestra tu rango actual y el avance al siguiente.
+- Muestra tu rango actual (emblemas SVG propios para los 14 rangos, de Madera a Mr Olympia) y el avance al siguiente.
 - Compara sentadilla, press banca, peso muerto, press militar, remo, dominadas, curl y tríceps con tablas globales por peso y sexo.
 - **Cuentas locales** con PIN opcional y sesión que se mantiene abierta.
-- **Sesiones de entrenamiento**: las series de un mismo día se agrupan, en orden.
+- **Marcas sencillas**: se anota la marca y ya; el historial se agrupa solo por día.
 - **Catálogo de ~300 ejercicios** para cualquier gimnasio (barra, mancuernas, máquinas, poleas, Smith, kettlebell, peso corporal, halterofilia, strongman, cardio), con búsqueda y filtros por músculo y equipo. Si falta uno, se puede crear.
 - Guarda todo en una base local del teléfono. No hay servidor.
 
@@ -29,9 +29,11 @@ Pensada para el teléfono: interfaz liquid glass, 100% responsive y datos guarda
 - Todo es **local**: no hay recuperación de PIN ni sincronización entre dispositivos. Borrar los datos del navegador borra las cuentas.
 - Si venías de la versión anterior (un solo perfil sin cuenta), tus datos se migran solos a una cuenta con el mismo nombre y sin PIN, y las marcas se agrupan por día en sesiones.
 
-## Sesiones de entrenamiento
+## Anotar marcas
 
-Al guardar la primera serie se abre una sesión y las siguientes se agrupan en ella. Se termina con **Terminar**; si queda abierta más de 6 horas sin series, se cierra sola y la siguiente serie abre una nueva.
+Eliges el ejercicio, ajustas peso y repeticiones (con − / +, ya rellenados con tu última marca) y pulsas **Guardar marca**. No hay que iniciar ni terminar nada: por debajo las marcas se agrupan solas por día en el historial. Antes de guardar ves tu 1RM estimado, el rango que daría y si sería marca personal.
+
+Cuando superas tu mejor marca de un ejercicio sale una **animación de marca personal** (kg anteriores → nuevos, +kg y, si toca, la subida de rango) con opción de compartirla.
 
 ## Ejercicios y rango
 

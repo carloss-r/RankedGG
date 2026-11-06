@@ -110,16 +110,16 @@ export function ManualScreen() {
             Ve a la pestaña "Marcas", elige el ejercicio, ingresa el peso en kg y las
             repeticiones (o los minutos en cardio). La app calcula tu 1RM estimado con la
             fórmula de Epley, y para el rango y el progreso usa tu mejor marca de cada
-            ejercicio. Todas tus series quedan guardadas en el historial.
+            ejercicio. Todas tus marcas quedan guardadas en el historial.
           </p>
         </Glass>
 
         <Glass className="px-4 py-4">
-          <h2 className="mb-2 text-[18px] font-semibold">Sesiones de entrenamiento</h2>
+          <h2 className="mb-2 text-[18px] font-semibold">Marcas personales</h2>
           <p className="text-[14px] leading-6 text-white/70">
-            Al guardar tu primera serie se abre una sesión y todas las siguientes se
-            agrupan en ella, en orden. Puedes terminarla con el botón "Terminar"; si la
-            olvidas abierta más de 6 horas, la siguiente serie empieza una sesión nueva.
+            No hay que iniciar ni terminar nada: solo anota la marca y guarda. Si superas tu
+            mejor 1RM de ese ejercicio verás una animación con tus kg nuevos y, si subes de
+            rango, también la subida. Tu historial se agrupa solo por día.
           </p>
         </Glass>
 

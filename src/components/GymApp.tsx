@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAuth, type AuthApi } from "../hooks/useAuth";
 import { useGym } from "../hooks/useGym";
 import { cleanName } from "../lib/auth";
-import type { Account } from "../lib/types";
+import type { Account, RecordEvent } from "../lib/types";
 import { AuthScreen } from "./AuthScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LogScreen } from "./screens/LogScreen";
@@ -12,6 +12,7 @@ import { ManualScreen } from "./screens/ManualScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
 import { RanksScreen } from "./screens/RanksScreen";
+import { RecordCelebration } from "./RecordCelebration";
 import { ShareSheet } from "./ShareSheet";
 
 const TABS = [
@@ -82,6 +83,7 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
   const [tab, setTab] = useState<TabId>("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [share, setShare] = useState<{ lift?: string } | null>(null);
+  const [record, setRecord] = useState<RecordEvent | null>(null);
 
   if (gym.error) return <Failure message={gym.error} onLogout={() => void auth.logout()} />;
   if (!gym.ready || !gym.profile || !gym.snapshot) return <Loading />;
@@ -110,15 +112,14 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
         )}
         {tab === "log" && (
           <LogScreen
+            profile={gym.profile}
             entries={gym.entries}
             sessions={gym.sessions}
-            activeSession={gym.activeSession}
             exercises={gym.exercises}
             getExercise={gym.getExercise}
             onLog={gym.logLift}
             onDelete={gym.removeLift}
-            onStart={gym.startSession}
-            onEnd={gym.endSession}
+            onRecord={setRecord}
             onCreateExercise={gym.addCustomExercise}
           />
         )}
@@ -159,6 +160,18 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
           <path d="M4 6h16M4 12h16M4 18h16" stroke="white" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </button>
+
+      {record && (
+        <RecordCelebration
+          record={record}
+          exerciseName={gym.getExercise(record.lift)?.name ?? "Ejercicio"}
+          onClose={() => setRecord(null)}
+          onShare={() => {
+            setShare({ lift: record.exerciseAfter ? record.lift : undefined });
+            setRecord(null);
+          }}
+        />
+      )}
 
       {share && (
         <ShareSheet

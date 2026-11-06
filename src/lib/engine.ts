@@ -14,7 +14,9 @@ import type {
   LiftScore,
   Profile,
   RankSnapshot,
+  RecordEvent,
   Sex,
+  Standing,
 } from "./types";
 
 export type ExerciseResolver = (id: LiftId) => Exercise | undefined;
@@ -120,6 +122,55 @@ export function rankLadder(levels: number[]): LadderStep[] {
 /** Redondea a 0,5 kg hacia arriba: lo que de verdad hay que levantar. */
 export function ceilToHalf(kg: number) {
   return Math.ceil(kg * 2 - 1e-9) / 2;
+}
+
+/** Rango (con división y puntos) que daría un 1RM en un ejercicio; null si el ejercicio no se puntúa. */
+export function liftStanding(
+  profile: Profile,
+  id: LiftId,
+  exercise: Exercise | undefined,
+  oneRm: number,
+): Standing | null {
+  const levels = levelsFor(profile.sex, id, exercise, profile.bodyweightKg);
+  if (!levels) return null;
+  return standingFromScore(oneRm > 0 ? scoreFromOneRm(oneRm, levels).score : 0);
+}
+
+/**
+ * Compara una serie nueva con el historial: ¿es marca personal? ¿sube de rango?
+ * `before` son las marcas anteriores; `entry` la serie recién guardada.
+ */
+export function detectRecord(
+  profile: Profile,
+  before: LiftEntry[],
+  entry: LiftEntry,
+  resolve: ExerciseResolver,
+): RecordEvent | null {
+  const newKg = entry.estimated1rm;
+  if (!(newKg > 0)) return null;
+  const previousKg = bestOneRm(before, entry.lift);
+  if (newKg <= previousKg + 1e-9) return null;
+
+  const exercise = resolve(entry.lift);
+  const exBefore = liftStanding(profile, entry.lift, exercise, previousKg);
+  const exAfter = liftStanding(profile, entry.lift, exercise, newKg);
+  const generalBefore = computeSnapshot(profile, before, resolve)?.standing ?? standingFromScore(0);
+  const generalAfter =
+    computeSnapshot(profile, [entry, ...before], resolve)?.standing ?? standingFromScore(0);
+  const index = (standing: Standing) => RANKS.findIndex((rank) => rank.id === standing.rank.id);
+
+  return {
+    lift: entry.lift,
+    kind: previousKg > 0 ? "pr" : "first",
+    previousKg,
+    newKg,
+    exerciseBefore: exBefore,
+    exerciseAfter: exAfter,
+    generalBefore,
+    generalAfter,
+    exerciseRankUp: !!exBefore && !!exAfter && index(exAfter) > index(exBefore),
+    generalRankUp: index(generalAfter) > index(generalBefore),
+  };
 }
 
 export function bestOneRm(entries: LiftEntry[], lift: LiftId) {

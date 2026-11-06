@@ -179,3 +179,19 @@ export type RankSnapshot = {
   standing: Standing;
   lifts: LiftScore[];
 };
+
+/** Una serie que supera tu mejor marca de ese ejercicio. */
+export type RecordEvent = {
+  lift: LiftId;
+  /** "first": primera marca del ejercicio; "pr": supera la anterior. */
+  kind: "first" | "pr";
+  previousKg: number;
+  newKg: number;
+  /** Rango del ejercicio antes/después (null si el ejercicio no puntúa). */
+  exerciseBefore: Standing | null;
+  exerciseAfter: Standing | null;
+  generalBefore: Standing;
+  generalAfter: Standing;
+  exerciseRankUp: boolean;
+  generalRankUp: boolean;
+};

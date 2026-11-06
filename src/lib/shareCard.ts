@@ -45,6 +45,10 @@ export type ShareCardData = {
   progress: number;
   photo: SharePhoto | null;
   view: PhotoView;
+  /** Emblema del rango ya cargado; si falta se dibuja el emoji. */
+  badge?: CanvasImageSource | null;
+  /** Nombre del siguiente rango (null en la cima). */
+  nextName?: string | null;
 };
 
 export const BRAND = "RANKEDGG";
@@ -224,43 +228,25 @@ function drawBrand(ctx: CanvasRenderingContext2D, w: number, data: ShareCardData
   setSpacing(ctx, 0);
 }
 
-function drawCrest(
+function drawBadge(
   ctx: CanvasRenderingContext2D,
   cx: number,
   cy: number,
-  radius: number,
+  size: number,
   data: ShareCardData,
 ) {
   ctx.save();
-  // Disco oscuro con brillo del rango.
   ctx.shadowColor = data.glow;
-  ctx.shadowBlur = 60;
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(8,10,18,0.82)";
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  const ring = radius - 14;
-  ctx.lineWidth = 16;
-  ctx.strokeStyle = "rgba(255,255,255,0.14)";
-  ctx.beginPath();
-  ctx.arc(cx, cy, ring, 0, Math.PI * 2);
-  ctx.stroke();
-
-  if (data.progress > 0) {
-    ctx.strokeStyle = data.color;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.arc(cx, cy, ring, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(data.progress, 0, 1));
-    ctx.stroke();
+  ctx.shadowBlur = 70;
+  if (data.badge) {
+    ctx.drawImage(data.badge, cx - size / 2, cy - size / 2, size, size);
+  } else {
+    ctx.font = `${size * 0.7}px ${EMOJI_FONT}`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fff";
+    ctx.fillText(data.icon, cx, cy);
   }
-
-  ctx.font = `${radius * 0.95}px ${EMOJI_FONT}`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "#fff";
-  ctx.fillText(data.icon, cx, cy + radius * 0.06);
   ctx.restore();
 }
 
@@ -354,10 +340,36 @@ export function drawShareCard(
   const nameSize = parseInt(ctx.font.match(/(\d+)px/)?.[1] ?? "100", 10);
   y -= nameSize + 36;
 
-  // Escudo del rango, sobre el nombre.
-  const crestR = Math.min(150, Math.max(96, (y - 140) / 2.4));
+  // Emblema del rango sobre el nombre, con el avance al siguiente rango al lado.
+  const badgeSize = Math.min(340, Math.max(200, y - 150));
+  const badgeCy = y - badgeSize / 2;
   ctx.shadowBlur = 0;
-  drawCrest(ctx, pad + crestR, y - crestR, crestR, data);
+  drawBadge(ctx, pad + badgeSize / 2, badgeCy, badgeSize, data);
+
+  const barX = pad + badgeSize + 36;
+  const barW = w - pad - barX;
+  if (barW > 160) {
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    setSpacing(ctx, 4);
+    ctx.font = `700 28px ${FONT}`;
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.shadowColor = "rgba(0,0,0,0.65)";
+    ctx.shadowBlur = 16;
+    ctx.fillText(data.nextName ? `HACIA ${data.nextName.toUpperCase()}` : "CIMA ABSOLUTA", barX, badgeCy - 14);
+    ctx.shadowBlur = 0;
+    roundedRect(ctx, barX, badgeCy + 8, barW, 20, 10);
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.fill();
+    const fillW = Math.max(20, barW * clamp(data.progress, 0, 1));
+    roundedRect(ctx, barX, badgeCy + 8, fillW, 20, 10);
+    ctx.fillStyle = data.color;
+    ctx.fill();
+    setSpacing(ctx, 0);
+    ctx.font = `700 30px ${FONT}`;
+    ctx.fillStyle = "#fff";
+    ctx.fillText(`${Math.round(clamp(data.progress, 0, 1) * 100)}%`, barX, badgeCy + 70);
+  }
 
   ctx.restore();
 }

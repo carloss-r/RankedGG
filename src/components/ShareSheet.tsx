@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import { loadBadgeImage } from "../lib/badges";
 import { formatKg, formatPercent } from "../lib/engine";
 import { shortName } from "../lib/exercises";
 import { SHARE_MIN_SCORE } from "../lib/ranks";
@@ -67,11 +68,27 @@ export function ShareSheet({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState("");
+  const [badge, setBadge] = useState<{ id: string; image: HTMLImageElement } | null>(null);
 
   const unlocked = generalOk || shareable.length > 0;
   const lift = target === GENERAL ? null : snapshot.lifts.find((item) => item.lift === target);
   const standing = lift ? lift.standing : snapshot.standing;
   const canShareTarget = lift ? lift.score >= SHARE_MIN_SCORE : generalOk;
+
+  const badgeRankId = standing.rank.id;
+  useEffect(() => {
+    let cancelled = false;
+    loadBadgeImage(badgeRankId, 640)
+      .then((image) => {
+        if (!cancelled) setBadge({ id: badgeRankId, image });
+      })
+      .catch(() => {
+        if (!cancelled) setBadge(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [badgeRankId]);
 
   const card: ShareCardData = useMemo(() => {
     const top = lift ? lift.percentile : snapshot.percentile;
@@ -91,8 +108,10 @@ export function ShareSheet({
       progress: standing.progress,
       photo,
       view,
+      badge: badge && badge.id === badgeRankId ? badge.image : null,
+      nextName: standing.nextRank?.name ?? null,
     };
-  }, [profile.name, lift, snapshot.percentile, snapshot.score, standing, getExercise, photo, view]);
+  }, [profile.name, lift, snapshot.percentile, snapshot.score, standing, getExercise, photo, view, badge, badgeRankId]);
 
   const size = SHARE_SIZES[format];
 
