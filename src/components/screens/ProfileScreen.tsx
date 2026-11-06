@@ -254,6 +254,23 @@ export function ProfileScreen({
         </p>
       </Glass>
 
+      <Glass className="flex flex-col gap-3 px-5 py-5">
+        <div>
+          <h2 className="text-[17px] font-semibold">Quejas y sugerencias</h2>
+          <p className="mt-1 text-[14px] leading-6 text-white/60">
+            ¿Algo no funciona o tienes una idea? Escríbenos por WhatsApp: 773 201 0315.
+          </p>
+        </div>
+        <a
+          href="https://wa.me/527732010315?text=Hola%2C%20te%20escribo%20desde%20RankedGG%3A%20"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-12 w-full items-center justify-center rounded-full bg-[#25d366] text-[15px] font-semibold text-black"
+        >
+          Escribir por WhatsApp
+        </a>
+      </Glass>
+
       <button
         type="button"
         onClick={async () => {

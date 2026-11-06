@@ -31,6 +31,7 @@ Pensada para el teléfono: interfaz liquid glass, 100% responsive y datos guarda
 - La sesión de inicio queda abierta hasta cerrar sesión. Las cuentas con PIN vuelven a pedirlo tras 30 días sin usar la app.
 - Todo es **local**: no hay recuperación de PIN ni sincronización entre dispositivos. Borrar los datos del navegador borra las cuentas.
 - Si venías de la versión anterior (un solo perfil sin cuenta), tus datos se migran solos a una cuenta con el mismo nombre y sin PIN, y las marcas se agrupan por día en sesiones.
+- En **Perfil** hay un botón de **Quejas y sugerencias** que abre WhatsApp con el 773 201 0315.
 
 ## Anotar marcas
 
