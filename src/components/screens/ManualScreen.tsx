@@ -35,6 +35,21 @@ export function ManualScreen() {
             <li>• <span className="text-white/80">Campeón/Titán</span> - Competitivo</li>
             <li>• <span className="text-white/80">Mr Olympia</span> - Cima absoluta</li>
           </ul>
+          <p className="mt-3 text-[13px] leading-5 text-white/60">
+            Cada rango tiene 3 divisiones (III → I) y 0–99 puntos dentro de cada una. En la
+            pestaña Rangos ves el 1RM que pide cada rango en cada ejercicio, según tu sexo y
+            peso corporal.
+          </p>
+        </Glass>
+
+        <Glass className="px-4 py-4">
+          <h2 className="mb-2 text-[18px] font-semibold">Compartir tu rango</h2>
+          <p className="text-[14px] leading-6 text-white/70">
+            Desde Bronce (nivel 24) en un ejercicio, o en tu rango general, puedes crear una
+            imagen PNG con tu nombre, tu rango en grande y la marca de agua de RankedGG.
+            Añade una foto de tu galería, encuádrala y compártela o guárdala. La foto se
+            procesa en tu dispositivo y no se sube a ningún servidor.
+          </p>
         </Glass>
 
         <Glass className="px-4 py-4">

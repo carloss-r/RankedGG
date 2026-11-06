@@ -1,4 +1,4 @@
-import type { Rank, RankId } from "./types";
+import type { Rank, RankId, Standing } from "./types";
 
 export const RANKS: Rank[] = [
   {
@@ -145,4 +145,41 @@ export function nextRankFromScore(score: number): Rank | null {
   const current = rankFromScore(score);
   const index = RANKS.findIndex((rank) => rank.id === current.id);
   return RANKS[index + 1] ?? null;
+}
+
+/** Divisiones por rango, como en un competitivo: III (la más baja) → I. */
+export const DIVISIONS = 3;
+const ROMAN = ["", "I", "II", "III"];
+
+/** Puntuación mínima (Bronce) para poder compartir una marca como tarjeta. */
+export const SHARE_MIN_SCORE = 24;
+
+export function standingFromScore(score: number): Standing {
+  const safe = Math.max(0, Math.min(100, Number.isFinite(score) ? score : 0));
+  const rank = rankFromScore(safe);
+  const nextRank = nextRankFromScore(safe);
+  if (!nextRank) {
+    const span = 100 - rank.minScore || 1;
+    return {
+      rank,
+      nextRank: null,
+      division: null,
+      label: rank.name,
+      points: Math.min(99, Math.floor(((safe - rank.minScore) / span) * 100)),
+      progress: 1,
+    };
+  }
+  const span = nextRank.minScore - rank.minScore;
+  const step = span / DIVISIONS;
+  const into = safe - rank.minScore;
+  const index = Math.min(DIVISIONS - 1, Math.floor(into / step));
+  const division = DIVISIONS - index;
+  return {
+    rank,
+    nextRank,
+    division,
+    label: `${rank.name} ${ROMAN[division]}`,
+    points: Math.min(99, Math.floor(((into - index * step) / step) * 100)),
+    progress: Math.min(1, into / span),
+  };
 }

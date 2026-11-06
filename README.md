@@ -13,6 +13,14 @@ Pensada para el teléfono: interfaz liquid glass, 100% responsive y datos guarda
 - **Catálogo de ~300 ejercicios** para cualquier gimnasio (barra, mancuernas, máquinas, poleas, Smith, kettlebell, peso corporal, halterofilia, strongman, cardio), con búsqueda y filtros por músculo y equipo. Si falta uno, se puede crear.
 - Guarda todo en una base local del teléfono. No hay servidor.
 
+## Rangos competitivos y tarjeta para compartir
+
+- 14 rangos (Madera → Mr Olympia), cada uno con **3 divisiones** (III → I) y **0–99 puntos** por división. Se calculan por **ejercicio** a partir de tu mejor 1RM y de tu sexo y peso corporal, y el **rango general** pondera los ejercicios.
+- En **Rangos** ves, por ejercicio, el **1RM exacto que pide cada rango** (kg) y cuál llevas.
+- Desde **Bronce** (nivel 24) en un ejercicio o en el general se desbloquea **Compartir**: genera un **PNG** (historia 1080×1920 o post 1080×1350) con tu nombre y tu rango en grande, escudo con progreso, percentil y **marca de agua RankedGG** (esquina + patrón diagonal).
+- Puedes **añadir una foto de tu galería**, arrastrarla y hacer zoom para encuadrarte. Todo se dibuja en el dispositivo con `canvas`; la foto no se sube a ningún sitio. Se comparte con el menú del sistema (Web Share) o se descarga.
+- Las dominadas puntúan por **peso extra**: solo con peso corporal no suman rango.
+
 ## Cuentas y sesión
 
 - Varias personas pueden usar el mismo teléfono; cada cuenta tiene su perfil, marcas y sesiones por separado.

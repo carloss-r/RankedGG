@@ -11,10 +11,12 @@ export function HomeScreen({
   profile,
   snapshot,
   getExercise,
+  onShare,
 }: {
   profile: Profile;
   snapshot: RankSnapshot;
   getExercise: (id: LiftId) => Exercise | undefined;
+  onShare: () => void;
 }) {
   const [quote, setQuote] = useState(getRandomQuote());
 
@@ -90,9 +92,11 @@ export function HomeScreen({
           <div>
             <p className="text-[13px] text-white/50">Rango actual</p>
             <h2 className="text-[34px] leading-none font-semibold tracking-tight">
-              {snapshot.rank.name}
+              {snapshot.standing.label}
             </h2>
-            <p className="mt-2 text-[14px] text-white/60">{snapshot.rank.subtitle}</p>
+            <p className="mt-2 text-[14px] text-white/60">
+              {snapshot.standing.points} pts · {snapshot.rank.subtitle}
+            </p>
           </div>
         </div>
         <div className="mt-5 flex items-end justify-between">
@@ -103,6 +107,13 @@ export function HomeScreen({
             al siguiente
           </p>
         </div>
+        <button
+          type="button"
+          onClick={onShare}
+          className="mt-5 h-12 w-full rounded-full bg-white text-[15px] font-semibold text-black"
+        >
+          Compartir mi rango
+        </button>
       </Glass>
 
       <Glass className="px-5 py-5">
@@ -130,11 +141,14 @@ export function HomeScreen({
                 className="h-full rounded-full"
                 style={{
                   width: `${Math.max(4, Math.min(100, lift.score))}%`,
-                  background: snapshot.rank.color,
+                  background: lift.standing.rank.color,
                 }}
               />
             </div>
-            <p className="mt-2 text-[12px] text-white/50">{lift.levelLabel}</p>
+            <p className="mt-2 text-[12px] text-white/50">
+              {lift.oneRm > 0 ? `${lift.standing.label} · ` : ""}
+              {lift.levelLabel}
+            </p>
           </Glass>
         ))}
       </div>

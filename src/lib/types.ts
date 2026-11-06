@@ -141,6 +141,15 @@ export type LiftEntry = {
   sessionId?: string;
 };
 
+export type Standing = {
+  rank: Rank;
+  nextRank: Rank | null;
+  division: number | null;
+  label: string;
+  points: number;
+  progress: number;
+};
+
 export type Rank = {
   id: RankId;
   name: string;
@@ -158,6 +167,7 @@ export type LiftScore = {
   percentile: number;
   levelLabel: string;
   nextKg: number | null;
+  standing: Standing;
 };
 
 export type RankSnapshot = {
@@ -166,5 +176,6 @@ export type RankSnapshot = {
   rank: Rank;
   nextRank: Rank | null;
   progressToNext: number;
+  standing: Standing;
   lifts: LiftScore[];
 };

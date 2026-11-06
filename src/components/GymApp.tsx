@@ -12,6 +12,7 @@ import { ManualScreen } from "./screens/ManualScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
 import { RanksScreen } from "./screens/RanksScreen";
+import { ShareSheet } from "./ShareSheet";
 
 const TABS = [
   { id: "home", label: "Inicio" },
@@ -80,6 +81,7 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
   const gym = useGym(account.id, account.name);
   const [tab, setTab] = useState<TabId>("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [share, setShare] = useState<{ lift?: string } | null>(null);
 
   if (gym.error) return <Failure message={gym.error} onLogout={() => void auth.logout()} />;
   if (!gym.ready || !gym.profile || !gym.snapshot) return <Loading />;
@@ -92,12 +94,20 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
             profile={gym.profile}
             snapshot={gym.snapshot}
             getExercise={gym.getExercise}
+            onShare={() => setShare({})}
           />
         )}
         {tab === "progress" && (
           <ProgressScreen entries={gym.entries} getExercise={gym.getExercise} />
         )}
-        {tab === "ranks" && <RanksScreen snapshot={gym.snapshot} />}
+        {tab === "ranks" && (
+          <RanksScreen
+            snapshot={gym.snapshot}
+            profile={gym.profile}
+            getExercise={gym.getExercise}
+            onShare={(lift) => setShare({ lift })}
+          />
+        )}
         {tab === "log" && (
           <LogScreen
             entries={gym.entries}
@@ -149,6 +159,16 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
           <path d="M4 6h16M4 12h16M4 18h16" stroke="white" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </button>
+
+      {share && (
+        <ShareSheet
+          profile={gym.profile}
+          snapshot={gym.snapshot}
+          getExercise={gym.getExercise}
+          initialLift={share.lift}
+          onClose={() => setShare(null)}
+        />
+      )}
 
       {/* Menu overlay */}
       {menuOpen && (

@@ -1,4 +1,4 @@
-import { nextRankFromScore, rankFromScore } from "./ranks";
+import { nextRankFromScore, RANKS, rankFromScore, standingFromScore } from "./ranks";
 import {
   expectedLevels,
   LEVEL_LABELS,
@@ -82,12 +82,44 @@ function scoreFromOneRm(oneRm: number, levels: number[]) {
     }
   }
 
+  // Por encima de la clase mundial: 98 → 100 en el siguiente 5 %.
+  const top = levels[levels.length - 1];
+  const t = clamp((oneRm - top) / (top * TOP_OVERSHOOT), 0, 1);
   return {
-    score: 100,
-    percentile: 99.7,
+    score: lerp(98, 100, t),
+    percentile: lerp(LEVEL_PERCENTILES[6], 99.7, t),
     levelIndex: 6,
     nextKg: null as number | null,
   };
+}
+
+const TOP_OVERSHOOT = 0.05;
+const KNOT_SCORES = [6, 18, 32, 50, 68, 86, 98];
+
+/** Inversa de scoreFromOneRm: el 1RM necesario para alcanzar una puntuación. */
+export function oneRmForScore(score: number, levels: number[]): number {
+  if (score <= 0) return 0;
+  if (score <= KNOT_SCORES[0]) return (score / KNOT_SCORES[0]) * levels[0];
+  for (let i = 0; i < levels.length - 1; i += 1) {
+    if (score <= KNOT_SCORES[i + 1]) {
+      const t = (score - KNOT_SCORES[i]) / (KNOT_SCORES[i + 1] - KNOT_SCORES[i]);
+      return lerp(levels[i], levels[i + 1], t);
+    }
+  }
+  const top = levels[levels.length - 1];
+  return top * (1 + (clamp(score, 98, 100) - 98) / 2 * TOP_OVERSHOOT);
+}
+
+export type LadderStep = { rank: (typeof RANKS)[number]; kg: number };
+
+/** Marca (1RM) que pide cada rango en un ejercicio. */
+export function rankLadder(levels: number[]): LadderStep[] {
+  return RANKS.map((rank) => ({ rank, kg: oneRmForScore(rank.minScore, levels) }));
+}
+
+/** Redondea a 0,5 kg hacia arriba: lo que de verdad hay que levantar. */
+export function ceilToHalf(kg: number) {
+  return Math.ceil(kg * 2 - 1e-9) / 2;
 }
 
 export function bestOneRm(entries: LiftEntry[], lift: LiftId) {
@@ -125,6 +157,7 @@ export function computeSnapshot(
       percentile: rated.percentile,
       levelLabel: LEVEL_LABELS[rated.levelIndex],
       nextKg: rated.nextKg,
+      standing: standingFromScore(oneRm > 0 ? rated.score : 0),
     };
   };
 
@@ -149,6 +182,7 @@ export function computeSnapshot(
       : logged.reduce((sum, lift) => sum + lift.percentile * weightOf(lift.lift), 0) /
         (totalWeight || 1);
 
+  const standing = standingFromScore(score);
   const rank = rankFromScore(score);
   const nextRank = nextRankFromScore(score);
   const floor = rank.minScore;
@@ -163,6 +197,7 @@ export function computeSnapshot(
     rank,
     nextRank,
     progressToNext,
+    standing,
     lifts,
   };
 }
