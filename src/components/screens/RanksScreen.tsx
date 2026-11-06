@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { ceilToHalf, formatKg, levelsFor, rankLadder } from "../../lib/engine";
 import { shortName } from "../../lib/exercises";
-import { RANKS, SHARE_MIN_SCORE } from "../../lib/ranks";
 import type { Exercise, LiftId, Profile, RankSnapshot } from "../../lib/types";
 import { RankBadge } from "../RankBadge";
 import { RankRoad } from "../RankRoad";
@@ -31,8 +30,7 @@ export function RanksScreen({
   }, [lift, profile.sex, profile.bodyweightKg, getExercise]);
 
   const general = snapshot.standing;
-  const canShareGeneral = snapshot.score >= SHARE_MIN_SCORE;
-  const canShareLift = !!lift && lift.oneRm > 0 && lift.score >= SHARE_MIN_SCORE;
+  const canShareLift = !!lift && lift.oneRm > 0;
 
   return (
     <div className="flex flex-col gap-5">
@@ -67,7 +65,7 @@ export function RanksScreen({
           onClick={() => onShare()}
           className="mt-4 h-12 w-full rounded-full bg-white text-[15px] font-semibold text-black"
         >
-          {canShareGeneral ? "Compartir mi rango" : "🔒 Compartir (desde Bronce)"}
+          Compartir mi rango
         </button>
       </Glass>
 
@@ -119,7 +117,6 @@ export function RanksScreen({
               <RankBadge
                 rankId={standing.rank.id}
                 size={64}
-                locked={lift.oneRm <= 0}
                 glow={lift.oneRm > 0 ? standing.rank.glow : undefined}
               />
             </div>
@@ -137,7 +134,7 @@ export function RanksScreen({
               onClick={() => onShare(lift.lift)}
               className="mt-4 h-11 w-full rounded-full bg-white/90 text-[14px] font-semibold text-black"
             >
-              {canShareLift ? "Compartir esta marca" : "🔒 Compartir (desde Bronce)"}
+              {canShareLift ? "Compartir esta marca" : "Compartir mi rango"}
             </button>
           </Glass>
         )}
@@ -150,10 +147,10 @@ export function RanksScreen({
               <Glass
                 key={rank.id}
                 className={`px-4 py-3 ${current ? "ring-2 ring-white/70" : ""}`}
-                style={{ opacity: reached ? 1 : 0.55 }}
+                style={{ opacity: reached ? 1 : 0.85 }}
               >
                 <div className="flex items-center gap-3">
-                  <RankBadge rankId={rank.id} size={46} locked={!reached} />
+                  <RankBadge rankId={rank.id} size={46} />
                   <div className="min-w-0 flex-1">
                     <p className="text-[16px] font-semibold">{rank.name}</p>
                     <p className="truncate text-[12px] text-white/50">{rank.subtitle}</p>
@@ -179,7 +176,7 @@ export function RanksScreen({
       </section>
 
       <p className="px-1 text-[12px] leading-5 text-white/40">
-        {RANKS.length} rangos · el general pondera tus ejercicios base (sentadilla, banca, peso
+        14 rangos · el general pondera tus ejercicios base (sentadilla, banca, peso
         muerto…) y suma los demás que registres.
       </p>
     </div>

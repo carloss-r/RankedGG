@@ -142,7 +142,7 @@ export function HomeScreen({
               <p className="truncate text-[12px] text-white/45">
                 {shortName(lift.lift, getExercise(lift.lift))}
               </p>
-              <RankBadge rankId={lift.standing.rank.id} size={26} locked={lift.oneRm <= 0} />
+              <RankBadge rankId={lift.standing.rank.id} size={26} />
             </div>
             <p className="mt-1 text-[22px] font-semibold">{formatKg(lift.oneRm)}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">

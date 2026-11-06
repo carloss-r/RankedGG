@@ -238,8 +238,6 @@ export function ShareSheet({
     }
   }
 
-  const needMessage = `Alcanza ${"Bronce"} (nivel ${SHARE_MIN_SCORE}) ${lift ? "en este ejercicio" : "en tu rango general"} para compartirlo.`;
-
   return (
     <div
       role="dialog"
@@ -265,8 +263,7 @@ export function ShareSheet({
             <p className="text-[40px]">🔒</p>
             <p className="mt-2 text-[17px] font-semibold">Aún no puedes compartir</p>
             <p className="mt-2 text-[14px] leading-5 text-white/65">
-              Sube una marca hasta Bronce (nivel {SHARE_MIN_SCORE}) en cualquier ejercicio, o
-              en tu rango general, y se desbloquea la tarjeta.
+              Anota al menos una marca y podrás crear tu tarjeta.
             </p>
           </div>
         ) : (
@@ -297,8 +294,6 @@ export function ShareSheet({
                 Post 4:5
               </Segment>
             </div>
-
-            {!canShareTarget && <ErrorNote>{needMessage}</ErrorNote>}
 
             <div className="overflow-hidden rounded-[28px] border border-white/15 bg-black shadow-2xl">
               <canvas

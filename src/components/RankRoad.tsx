@@ -47,7 +47,6 @@ export function RankRoad({ currentId }: { currentId: RankId }) {
                 <RankBadge
                   rankId={rank.id}
                   size={44}
-                  locked={!reached}
                   glow={current ? rank.glow : undefined}
                   className={current ? "rg-float" : ""}
                 />

@@ -45,7 +45,7 @@ export function ManualScreen() {
         <Glass className="px-4 py-4">
           <h2 className="mb-2 text-[18px] font-semibold">Compartir tu rango</h2>
           <p className="text-[14px] leading-6 text-white/70">
-            Desde Bronce (nivel 24) en un ejercicio, o en tu rango general, puedes crear una
+            En cualquier rango, desde Madera, y en cualquier ejercicio con marca (o en tu rango general), puedes crear una
             imagen PNG con tu nombre, tu rango en grande y la marca de agua de RankedGG.
             Añade una foto de tu galería, encuádrala y compártela o guárdala. La foto se
             procesa en tu dispositivo y no se sube a ningún servidor.

@@ -151,8 +151,8 @@ export function nextRankFromScore(score: number): Rank | null {
 export const DIVISIONS = 3;
 const ROMAN = ["", "I", "II", "III"];
 
-/** Puntuación mínima (Bronce) para poder compartir una marca como tarjeta. */
-export const SHARE_MIN_SCORE = 24;
+/** Puntuación mínima para compartir: 0 = se puede compartir desde Madera. */
+export const SHARE_MIN_SCORE = 0;
 
 export function standingFromScore(score: number): Standing {
   const safe = Math.max(0, Math.min(100, Number.isFinite(score) ? score : 0));
