@@ -18,8 +18,9 @@ Pensada para el teléfono: interfaz liquid glass, 100% responsive y datos guarda
 - 14 rangos (Madera → Mr Olympia), cada uno con **3 divisiones** (III → I) y **0–99 puntos** por división. Se calculan por **ejercicio** a partir de tu mejor 1RM y de tu sexo y peso corporal, y el **rango general** pondera los ejercicios.
 - En **Rangos** ves, por ejercicio, el **1RM exacto que pide cada rango** (kg) y cuál llevas.
 - **Compartir** está disponible desde **Madera**, sin bloqueos: genera un **PNG** minimalista (historia 1080×1920 o post 1080×1350) con tu nombre, tu rango en grande, tu marca y tu percentil, y la **marca de agua RankedGG** abajo.
-- Se personaliza a tu gusto: **7 tipografías**, **posición** de los datos (9 posiciones o arrastrándolos sobre la imagen), alineación, **qué datos mostrar** (emblema, nombre, ejercicio, rango, marca, puntos, percentil, progreso), tamaño, oscurecido de la foto y color (del rango o blanco). El estilo se recuerda en el dispositivo.
-- Puedes **añadir una foto de tu galería**, arrastrarla y hacer zoom. Todo se dibuja en el dispositivo con `canvas`; la foto no se sube a ningún sitio. Se comparte con el menú del sistema (Web Share) o se descarga.
+- **Editor tipo historias de Instagram**: la tarjeta ocupa la pantalla (sin scroll) y se maneja con gestos: **arrastra** la foto o los datos con el dedo, **pellizca** para hacer zoom (en escritorio, la rueda del ratón) y los datos se **imantan al centro** con una guía. Los controles van en una barra inferior (Marca, Foto, Datos, Letra, Lugar, Estilo) que abre un panel compacto; en pantallas grandes es un panel lateral.
+- Se personaliza a tu gusto: **7 tipografías**, **posición** de los datos (9 posiciones o arrastrándolos), alineación, **qué datos mostrar** (emblema, nombre, ejercicio, rango, marca, puntos, percentil, progreso), tamaño, oscurecido de la foto y color (del rango o blanco). El estilo se recuerda en el dispositivo.
+- Puedes **añadir una foto de tu galería**. Todo se dibuja en el dispositivo con `canvas`; la foto no se sube a ningún sitio. Se comparte con el menú del sistema (Web Share) o se descarga.
 - Las tipografías son las del sistema (sin descargas), así que cada teléfono usa la más parecida que tenga.
 - Las dominadas puntúan por **peso extra**: solo con peso corporal no suman rango.
 

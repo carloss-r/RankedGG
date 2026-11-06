@@ -193,6 +193,14 @@ export type ShareCardData = {
   nextName?: string | null;
 };
 
+/** Ayudas solo para la vista previa (no se exportan). */
+export type PreviewOverlay = {
+  /** Contorno punteado alrededor de los datos mientras se arrastran. */
+  outline: boolean;
+  guideX: boolean;
+  guideY: boolean;
+};
+
 /** Zona ocupada por el bloque de datos (en píxeles del lienzo). */
 export type BlockRect = { x: number; y: number; w: number; h: number };
 
@@ -332,6 +340,7 @@ export function drawShareCard(
   w: number,
   h: number,
   data: ShareCardData,
+  overlay?: PreviewOverlay,
 ): BlockRect | null {
   const style = data.style;
   const font = FONTS[style.font];
@@ -534,6 +543,33 @@ export function drawShareCard(
   }
 
   drawWatermark(ctx, w, h, font);
+
+  if (overlay) {
+    ctx.save();
+    ctx.lineWidth = 5;
+    if (overlay.guideX || overlay.guideY) {
+      ctx.strokeStyle = "rgba(255,214,10,0.95)";
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      if (overlay.guideX) {
+        ctx.moveTo(w / 2, 0);
+        ctx.lineTo(w / 2, h);
+      }
+      if (overlay.guideY) {
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+      }
+      ctx.stroke();
+    }
+    if (overlay.outline && rect) {
+      ctx.strokeStyle = "rgba(255,255,255,0.8)";
+      ctx.setLineDash([14, 10]);
+      roundedRect(ctx, rect.x - 18, rect.y - 18, rect.w + 36, rect.h + 36, 22);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   ctx.restore();
   return rect;
 }
