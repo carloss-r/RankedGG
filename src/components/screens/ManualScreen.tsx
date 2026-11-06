@@ -47,7 +47,7 @@ export function ManualScreen() {
           <p className="text-[14px] leading-6 text-white/70">
             En cualquier rango, desde Madera, y en cualquier ejercicio con marca (o en tu rango general), puedes crear una
             imagen PNG con tu nombre, tu rango en grande y la marca de agua de RankedGG.
-            Añade una foto de tu galería, encuádrala y compártela o guárdala. La foto se
+            Añade una foto de tu galería, encuádrala, elige la tipografía, qué datos mostrar y dónde ponerlos (arrastrándolos o con las posiciones), y compártela o guárdala. La foto se
             procesa en tu dispositivo y no se sube a ningún servidor.
           </p>
         </Glass>
