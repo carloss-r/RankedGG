@@ -420,7 +420,7 @@ export function ShareSheet({
       role="dialog"
       aria-modal="true"
       aria-label="Compartir rango"
-      className="fixed inset-0 z-50 flex flex-col bg-[#05060a] md:flex-row"
+      className="rg-fade-in fixed inset-0 z-50 flex flex-col bg-[#05060a] md:flex-row"
     >
       <div className="flex min-h-0 flex-1 flex-col">
         <header className="flex items-center gap-2 px-3 pt-[calc(10px+var(--safe-top))] pb-2">

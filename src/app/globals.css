@@ -93,6 +93,47 @@ input[type="number"] {
   appearance: textfield;
 }
 
+/* ---------- Transiciones estilo iOS (sutiles) ---------- */
+:root {
+  --ease-ios: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes rg-screen-in {
+  from { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.995); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes rg-menu-in {
+  from { opacity: 0; transform: scale(0.9) translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+}
+@keyframes rg-menu-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.94) translate3d(0, 6px, 0); }
+}
+@keyframes rg-sheet-in {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes rg-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.rg-screen { animation: rg-screen-in 0.4s var(--ease-ios) backwards; }
+.rg-menu-in { transform-origin: bottom right; animation: rg-menu-in 0.32s var(--ease-ios) both; }
+.rg-menu-out { transform-origin: bottom right; animation: rg-menu-out 0.18s ease-in both; }
+.rg-sheet-in { animation: rg-sheet-in 0.38s var(--ease-ios) both; }
+.rg-backdrop-out { animation: rg-backdrop-out 0.18s ease-in both; }
+
+/* Respuesta táctil al pulsar, como en iOS */
+button, a[href] {
+  transition: transform 0.22s var(--ease-ios), opacity 0.2s ease, background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+button:not(:disabled):active, a[href]:active {
+  transform: scale(0.97);
+  transition-duration: 0.08s;
+}
+
 /* ---------- Animaciones de marca personal ---------- */
 @keyframes rg-fade-in {
   from { opacity: 0; }
@@ -127,7 +168,7 @@ input[type="number"] {
 
 .rg-fade-in { animation: rg-fade-in 0.25s ease-out both; }
 .rg-pop { animation: rg-pop 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
-.rg-rise { animation: rg-rise 0.55s ease-out both; }
+.rg-rise { animation: rg-rise 0.6s var(--ease-ios) both; }
 .rg-ring { animation: rg-ring 1.4s ease-out both; }
 .rg-float { animation: rg-float 3.2s ease-in-out infinite; }
 .rg-swap-out { animation: rg-swap-out 0.45s ease-in both; }
@@ -142,4 +183,9 @@ input[type="number"] {
     animation: none !important;
   }
   .rg-confetti { display: none; }
+  .rg-screen, .rg-menu-in, .rg-menu-out, .rg-sheet-in, .rg-backdrop-out {
+    animation: none !important;
+  }
+  button, a[href] { transition: none; }
+  button:not(:disabled):active, a[href]:active { transform: none; }
 }

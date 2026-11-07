@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAuth, type AuthApi } from "../hooks/useAuth";
 import { useGym } from "../hooks/useGym";
 import { cleanName } from "../lib/auth";
@@ -82,8 +82,40 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
   const gym = useGym(account.id, account.name);
   const [tab, setTab] = useState<TabId>("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
   const [share, setShare] = useState<{ lift?: string } | null>(null);
   const [record, setRecord] = useState<RecordEvent | null>(null);
+
+  const closeTimer = useRef<number | null>(null);
+  const closeMenu = () => {
+    if (!menuOpen || menuClosing) return;
+    setMenuClosing(true);
+    closeTimer.current = window.setTimeout(() => {
+      closeTimer.current = null;
+      setMenuOpen(false);
+      setMenuClosing(false);
+    }, 180);
+  };
+  const toggleMenu = () => {
+    if (menuClosing) {
+      // Si se vuelve a pulsar mientras se cierra, el menú simplemente se queda abierto.
+      if (closeTimer.current !== null) window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+      setMenuClosing(false);
+    } else if (menuOpen) {
+      closeMenu();
+    } else {
+      setMenuOpen(true);
+    }
+  };
+
+  const goTo = (id: TabId) => {
+    if (id !== tab) {
+      setTab(id);
+      window.scrollTo({ top: 0 });
+    }
+    closeMenu();
+  };
 
   if (gym.error) return <Failure message={gym.error} onLogout={() => void auth.logout()} />;
   if (!gym.ready || !gym.profile || !gym.snapshot) return <Loading />;
@@ -91,6 +123,7 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
       <main className="flex-1 px-5 pt-[calc(var(--safe-top)+18px)] pb-[calc(96px+var(--safe-bottom))]">
+        <div key={tab} className="rg-screen">
         {tab === "home" && (
           <HomeScreen
             profile={gym.profile}
@@ -146,6 +179,7 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
             }}
           />
         )}
+        </div>
       </main>
 
       {/* Floating menu button */}
@@ -153,7 +187,7 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
         type="button"
         aria-label="Abrir menú"
         aria-expanded={menuOpen}
-        onClick={() => setMenuOpen(!menuOpen)}
+        onClick={toggleMenu}
         className="glass-strong fixed bottom-6 right-6 z-30 flex h-16 w-16 items-center justify-center rounded-full border border-white/20 shadow-2xl"
       >
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -187,20 +221,17 @@ function GymMain({ account, auth }: { account: Account; auth: AuthApi }) {
       {menuOpen && (
         <>
           <div
-            className="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm"
-            onClick={() => setMenuOpen(false)}
+            className={`${menuClosing ? "rg-backdrop-out" : "rg-fade-in"} fixed inset-0 z-20 bg-black/60 backdrop-blur-sm`}
+            onClick={closeMenu}
           />
-          <div className="glass-strong fixed bottom-24 right-6 z-30 w-56 rounded-2xl border border-white/10 p-2 shadow-2xl">
+          <div className={`${menuClosing ? "rg-menu-out" : "rg-menu-in"} glass-strong fixed bottom-24 right-6 z-30 w-56 rounded-2xl border border-white/10 p-2 shadow-2xl`}>
             {TABS.map((item) => {
               const active = tab === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => {
-                    setTab(item.id);
-                    setMenuOpen(false);
-                  }}
+                  onClick={() => goTo(item.id)}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[15px] ${
                     active ? "bg-white/10 text-white" : "text-white/70"
                   }`}
